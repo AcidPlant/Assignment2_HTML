@@ -1,123 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Souls-like Games - Contact</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Souls-like Games - Contact</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
 
-<body>
-
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-logo">
-            <span class="logo-text">SOULS-LIKE</span>
+    <body>
+    <!-- Task 5: Bootstrap Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand text-danger fw-bold fs-3" href="index.html">SOULS-LIKE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="library.html">Library</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="contact.html">Contact</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li><a href="library.html" class="nav-link">Library</a></li>
-            <li><a href="about.html" class="nav-link">About</a></li>
-            <li><a href="contact.html" class="nav-link active">Contact</a></li>
-        </ul>
-    </div>
-</nav>
+    </nav>
 
-<main class="contact-main">
-    <div class="container">
-        <h1 class="contact-title">Contact Us</h1>
+    <main class="contact-main pt-5 mt-5">
+        <div class="container">
+            <h1 class="text-center text-danger display-3 mb-5">Contact Us</h1>
 
-        <div class="contact-content">
-            <div class="contact-info">
-                <h2>Get In Touch</h2>
-                <p>Have questions about souls-like games? Want to suggest a game for our library? Reach out to us! We're always happy to hear from fellow enthusiasts.</p>
+            <div class="row g-5">
+                <div class="col-lg-6">
+                    <div class="p-4 bg-dark text-white rounded shadow h-100">
+                        <h2 class="text-danger mb-4">Get In Touch</h2>
+                        <p class="mb-4">Have questions about souls-like games? Want to suggest a game for our library? Reach out to us! We're always happy to hear from fellow enthusiasts.</p>
 
-                <div class="contact-details">
-                    <div class="contact-item">
-                        <h3>Email</h3>
-                        <p>info@soulslikegames.com</p>
-                    </div>
+                        <div class="contact-details">
+                            <div class="contact-item mb-4">
+                                <h3 class="text-danger">Email</h3>
+                                <p>info@soulslikegames.com</p>
+                            </div>
 
-                    <div class="contact-item">
-                        <h3>Discord</h3>
-                        <p>Join our community: SoulsLikeHQ</p>
-                    </div>
+                            <div class="contact-item mb-4">
+                                <h3 class="text-danger">Discord</h3>
+                                <p>Join our community: SoulsLikeHQ</p>
+                            </div>
 
-                    <div class="contact-item">
-                        <h3>Social Media</h3>
-                        <div class="social-links">
-                            <a href="#" class="social-link">Twitter</a>
-                            <a href="#" class="social-link">Instagram</a>
-                            <a href="#" class="social-link">YouTube</a>
-                            <a href="#" class="social-link">Reddit</a>
+                            <div class="contact-item">
+                                <h3 class="text-danger">Social Media</h3>
+                                <div class="social-links">
+                                    <!-- Task 6: Bootstrap Buttons -->
+                                    <div class="btn-group-vertical w-100">
+                                        <button class="btn btn-outline-light text-start">Twitter</button>
+                                        <button class="btn btn-outline-light text-start">Instagram</button>
+                                        <button class="btn btn-outline-light text-start">YouTube</button>
+                                        <button class="btn btn-outline-light text-start">Reddit</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="contact-form-container">
-                <h2>Send us a Message</h2>
-                <form class="contact-form" action="contact.html" method="GET">
-                    <div class="form-group">
-                        <label for="name">Your Name</label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="Enter your name" required>
+                <div class="col-lg-6">
+                    <div class="p-4 bg-secondary text-white rounded shadow h-100">
+                        <h2 class="text-danger mb-4">Send us a Message</h2>
+                        <!-- Task 9: Responsive Form Design -->
+                        <form class="contact-form" action="contact.html" method="GET">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control bg-dark text-white border-dark" id="name" name="name" placeholder="Enter your name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Your Email</label>
+                                <input type="email" class="form-control bg-dark text-white border-dark" id="email" name="email" placeholder="Enter your email" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject</label>
+                                <select class="form-select bg-dark text-white border-dark" id="subject" name="subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="suggestion">Game Suggestion</option>
+                                    <option value="question">Question</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="technical">Technical Issue</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="message" class="form-label">Your Message</label>
+                                <textarea class="form-control bg-dark text-white border-dark" id="message" name="message" rows="5" placeholder="Type your message here..." required></textarea>
+                            </div>
+
+                            <!-- Task 6: Bootstrap Buttons -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-danger btn-lg">Send Message</button>
+                            </div>
+                        </form>
                     </div>
-
-                    <div class="form-group">
-                        <label for="email">Your Email</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <select id="subject" name="subject" class="form-input" required>
-                            <option value="">Select a subject</option>
-                            <option value="suggestion">Game Suggestion</option>
-                            <option value="question">Question</option>
-                            <option value="partnership">Partnership</option>
-                            <option value="technical">Technical Issue</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">Your Message</label>
-                        <textarea id="message" name="message" class="form-textarea" rows="5" placeholder="Type your message here..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="form-button">Send Message</button>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>About</h4>
-                <p>Souls-like Games - your guide to the world of hardcore games</p>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <h4 class="text-danger">About</h4>
+                    <p>Souls-like Games - your guide to the world of hardcore games</p>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <h4 class="text-danger">Navigation</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="library.html" class="text-white text-decoration-none">Library</a></li>
+                        <li><a href="about.html" class="text-white text-decoration-none">About</a></li>
+                        <li><a href="contact.html" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <h4 class="text-danger">Team Hollows</h4>
+                    <p>Team Members: Mukhidinov Nursultan, Baltin Bakhtiyar</p>
+                </div>
             </div>
-            <div class="footer-section">
-                <h4>Navigation</h4>
-                <ul class="footer-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="library.html">Library</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Team Hollows</h4>
-                <p class="team-members">Team Members: Mukhidinov Nursultan, Baltin Bakhtiyar</p>
+            <div class="text-center mt-4 pt-4 border-top border-secondary">
+                <p>&copy; 2025 Souls-like Games. All rights reserved.</p>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Souls-like Games. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
-</body>
-</html>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+
+    </html>
