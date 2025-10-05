@@ -5,155 +5,430 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Souls-like Games - Library</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-logo">
-            <span class="logo-text">SOULS-LIKE</span>
+<!-- Task 5: Bootstrap Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand text-danger fw-bold fs-3" href="index.html">SOULS-LIKE</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="library.html">Library</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact</a>
+                </li>
+            </ul>
         </div>
-        <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li><a href="library.html" class="nav-link active">Library</a></li>
-            <li><a href="about.html" class="nav-link">About</a></li>
-            <li><a href="contact.html" class="nav-link">Contact</a></li>
-        </ul>
     </div>
 </nav>
 
-<main class="library-main">
+<main class="library-main pt-5 mt-5">
     <div class="container">
-        <h1 class="library-title">Souls-like Games Library</h1>
+        <h1 class="text-center text-danger display-3 mb-5">Souls-like Games Library</h1>
 
-
-        <div class="search-section">
-            <form class="search-form">
-                <input type="text" class="search-input" placeholder="Search for games..." id="searchInput">
-                <select class="category-filter" id="categoryFilter">
-                    <option value="">All categories</option>
-                    <option value="anime">Anime</option>
-                    <option value="platformer">Platformer</option>
-                    <option value="metroidvania">Metroidvania</option>
-                    <option value="3d">3D Action</option>
-                </select>
-                <button type="submit" class="search-button">Search</button>
-            </form>
+        <!-- Task 9: Responsive Form Design -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <form class="d-flex flex-column flex-md-row gap-3">
+                    <input type="text" class="form-control bg-secondary text-white border-dark" placeholder="Search for games..." id="searchInput">
+                    <select class="form-select bg-secondary text-white border-dark" id="categoryFilter">
+                        <option value="">All categories</option>
+                        <option value="anime">Anime</option>
+                        <option value="platformer">Platformer</option>
+                        <option value="metroidvania">Metroidvania</option>
+                        <option value="3d">3D Action</option>
+                        <option value="open-world">Open World</option>
+                    </select>
+                    <button type="submit" class="btn btn-danger px-4">Search</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Task 4: Image Gallery with Grid -->
-        <section class="grid-gallery-section">
-            <h2 class="section-title">Souls-like Games Gallery</h2>
-            <div class="grid-gallery">
-                <div class="gallery-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/ru/b/bb/Dark_souls_3_cover_art.jpg" alt="Dark Souls III">
-                    <div class="gallery-caption">
-                        <h3>Dark Souls III</h3>
-                        <p>The final chapter of the legendary series</p>
+        <!-- Task 7: Bootstrap Carousel with 9+ Images -->
+        <section class="mb-5">
+            <h2 class="text-center text-danger mb-4 display-4">Featured Games</h2>
+            <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="5"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="6"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="7"></button>
+                    <button type="button" data-bs-target="#gameCarousel" data-bs-slide-to="8"></button>
+                </div>
+                <div class="carousel-inner rounded shadow">
+                    <div class="carousel-item active">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/b/bb/Dark_souls_3_cover_art.jpg" class="d-block w-100" alt="Dark Souls III" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Dark Souls III</h3>
+                            <p>The final chapter of the legendary series</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Hollow_Knight_first_cover_art.webp/250px-Hollow_Knight_first_cover_art.webp.png" class="d-block w-100" alt="Hollow Knight" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Hollow Knight</h3>
+                            <p>2D metroidvania in a forgotten insect kingdom</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/7/7c/Elden_Ring_-_cover.jpg/330px-Elden_Ring_-_cover.jpg" class="d-block w-100" alt="Elden Ring" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Elden Ring</h3>
+                            <p>Open world from FromSoftware and George R.R. Martin</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://igm.gg/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Figm-s3%2FPROD%2F202408%2F5cbad147%2FCODE_VEIN_2_11zon.png&w=640&q=75" class="d-block w-100" alt="Code Vein" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Code Vein</h3>
+                            <p>Anime souls-like in a post-apocalyptic vampire world</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://korobok.store/upload/iblock/596/hf2hbwwfovu1f9iyko2bw0ufx15g52cq.webp" class="d-block w-100" alt="Blasphemous" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Blasphemous</h3>
+                            <p>Dark 2D platformer in a gothic world</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://blog.allo.ua/wp-content/uploads/2019/02/MyCollages1-1.jpg" class="d-block w-100" alt="Sekiro" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Sekiro: Shadows Die Twice</h3>
+                            <p>Become a ninja in feudal Japan</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_SaltAndSanctuary.jpg" class="d-block w-100" alt="Salt and Sanctuary" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Salt and Sanctuary</h3>
+                            <p>2D souls-like with deep progression system</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/1/1f/Nioh_2_%28%D0%BE%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0%29.jpg" class="d-block w-100" alt="Nioh 2" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Nioh 2</h3>
+                            <p>Souls-like in the Sengoku era</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70010000042935/057249cae8e50e80c9b6c1c8c5b5d5c5b9b0c3e0e3e3e3e3e3e3e3e3e3e3e3e3" class="d-block w-100" alt="Dark Souls Remastered" style="height: 500px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-3">
+                            <h3>Dark Souls Remastered</h3>
+                            <p>The game that started it all</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Task 8: Bootstrap Cards - Full Games Library -->
+        <section>
+            <h2 class="text-center text-danger mb-4 display-4">All Games Collection</h2>
+            <div class="row g-4">
+                <!-- Game 1 - Dark Souls III -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/b/bb/Dark_souls_3_cover_art.jpg" class="card-img-top" alt="Dark Souls III" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Dark Souls III</h3>
+                            <p class="card-text flex-grow-1">The final chapter of the legendary series. Explore a dying world, fight powerful bosses and uncover the secrets of the fading flame.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">3D Action</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Hollow_Knight_first_cover_art.webp/250px-Hollow_Knight_first_cover_art.webp.png" alt="Hollow Knight">
-                    <div class="gallery-caption">
-                        <h3>Hollow Knight</h3>
-                        <p>2D metroidvania in a forgotten insect kingdom</p>
+                <!-- Game 2 - Hollow Knight -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Hollow_Knight_first_cover_art.webp/250px-Hollow_Knight_first_cover_art.webp.png" class="card-img-top" alt="Hollow Knight" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Hollow Knight</h3>
+                            <p class="card-text flex-grow-1">2D metroidvania in a forgotten insect kingdom. Elegant combat system, atmospheric world and challenging trials.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Metroidvania</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://igm.gg/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Figm-s3%2FPROD%2F202408%2F5cbad147%2FCODE_VEIN_2_11zon.png&w=640&q=75" alt="Code Vein">
-                    <div class="gallery-caption">
-                        <h3>Code Vein</h3>
-                        <p>Anime souls-like in a post-apocalyptic vampire world</p>
+                <!-- Game 3 - Code Vein -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://igm.gg/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Figm-s3%2FPROD%2F202408%2F5cbad147%2FCODE_VEIN_2_11zon.png&w=640&q=75" class="card-img-top" alt="Code Vein" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Code Vein</h3>
+                            <p class="card-text flex-grow-1">Anime souls-like in a post-apocalyptic vampire world with deep character customization and cooperative gameplay.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Anime</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://korobok.store/upload/iblock/596/hf2hbwwfovu1f9iyko2bw0ufx15g52cq.webp" alt="Blasphemous">
-                    <div class="gallery-caption">
-                        <h3>Blasphemous</h3>
-                        <p>Dark 2D platformer in a gothic world</p>
+                <!-- Game 4 - Blasphemous -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://korobok.store/upload/iblock/596/hf2hbwwfovu1f9iyko2bw0ufx15g52cq.webp" class="card-img-top" alt="Blasphemous" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Blasphemous</h3>
+                            <p class="card-text flex-grow-1">Dark 2D platformer in a gothic world filled with religious symbolism and brutal combat mechanics.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Platformer</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://blog.allo.ua/wp-content/uploads/2019/02/MyCollages1-1.jpg" alt="Sekiro">
-                    <div class="gallery-caption">
-                        <h3>Sekiro: Shadows Die Twice</h3>
-                        <p>Become a ninja in feudal Japan</p>
+                <!-- Game 5 - Sekiro -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://blog.allo.ua/wp-content/uploads/2019/02/MyCollages1-1.jpg" class="card-img-top" alt="Sekiro" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Sekiro: Shadows Die Twice</h3>
+                            <p class="card-text flex-grow-1">Master the art of the shinobi in feudal Japan. Precision combat with posture-breaking mechanics and stealth gameplay.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">3D Action</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/7/7c/Elden_Ring_-_cover.jpg/330px-Elden_Ring_-_cover.jpg" alt="Elden Ring">
-                    <div class="gallery-caption">
-                        <h3>Elden Ring</h3>
-                        <p>Open world from FromSoftware and George R.R. Martin</p>
+                <!-- Game 6 - Elden Ring -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/7/7c/Elden_Ring_-_cover.jpg/330px-Elden_Ring_-_cover.jpg" class="card-img-top" alt="Elden Ring" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Elden Ring</h3>
+                            <p class="card-text flex-grow-1">Open world from FromSoftware and George R.R. Martin. Explore the Lands Between and become the Elden Lord.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Open World</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_SaltAndSanctuary.jpg" alt="Salt and Sanctuary">
-                    <div class="gallery-caption">
-                        <h3>Salt and Sanctuary</h3>
-                        <p>2D souls-like with deep progression system</p>
+                <!-- Game 7 - Salt and Sanctuary -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_SaltAndSanctuary.jpg" class="card-img-top" alt="Salt and Sanctuary" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Salt and Sanctuary</h3>
+                            <p class="card-text flex-grow-1">2D souls-like with deep RPG progression, extensive weapon variety, and challenging boss encounters in a dark fantasy world.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Metroidvania</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/ru/1/1f/Nioh_2_%28%D0%BE%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0%29.jpg" alt="Nioh 2">
-                    <div class="gallery-caption">
-                        <h3>Nioh 2</h3>
-                        <p>Souls-like in the Sengoku era</p>
+                <!-- Game 8 - Nioh 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/ru/1/1f/Nioh_2_%28%D0%BE%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0%29.jpg" class="card-img-top" alt="Nioh 2" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Nioh 2</h3>
+                            <p class="card-text flex-grow-1">Souls-like action RPG set in the Sengoku period with Yokai transformations, deep combat stances, and loot-driven progression.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Anime</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="gallery-item">
-                    <img src="https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70010000042935/057249cae8e50e80c9b6c1c8c5b5d5c5b9b0c3e0e3e3e3e3e3e3e3e3e3e3e3e3" alt="Dark Souls Remastered">
-                    <div class="gallery-caption">
-                        <h3>Dark Souls Remastered</h3>
-                        <p>The game that started it all</p>
+                <!-- Game 9 - Dark Souls Remastered -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70010000042935/057249cae8e50e80c9b6c1c8c5b5d5c5b9b0c3e0e3e3e3e3e3e3e3e3e3e3e3e3" class="card-img-top" alt="Dark Souls Remastered" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Dark Souls Remastered</h3>
+                            <p class="card-text flex-grow-1">The game that defined the genre. Experience the original challenging gameplay with improved graphics and performance.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">3D Action</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 10 - Bloodborne -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://image.api.playstation.com/vulcan/img/rnd/202010/2621/6cLfskq9fRR4Hh6r5NhbC8qJ.png" class="card-img-top" alt="Bloodborne" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Bloodborne</h3>
+                            <p class="card-text flex-grow-1">Gothic horror souls-like with fast-paced combat, trick weapons, and Lovecraftian themes in the cursed city of Yharnam.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Gothic Horror</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 11 - Mortal Shell -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/8a/Mortal_Shell_cover_art.jpg/256px-Mortal_Shell_cover_art.jpg" class="card-img-top" alt="Mortal Shell" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Mortal Shell</h3>
+                            <p class="card-text flex-grow-1">Indie souls-like with unique hardening mechanic, allowing players to turn to stone to absorb enemy attacks.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Indie</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 12 - Lies of P -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary text-white h-100 shadow">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/2/2a/Lies_of_P_cover_art.jpg/256px-Lies_of_P_cover_art.jpg" class="card-img-top" alt="Lies of P" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="card-title text-danger">Lies of P</h3>
+                            <p class="card-text flex-grow-1">Pinocchio-inspired souls-like set in a dark Belle Époque world with weapon assembly and lie-based narrative choices.</p>
+                            <div class="mt-auto">
+                                <span class="badge bg-danger mb-2">Steampunk</span>
+                                <div class="btn-group w-100">
+                                    <a href="#" class="btn btn-outline-light btn-sm">Details</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Play</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div class="games-grid">
-            <!-- Existing game cards remain unchanged -->
-        </div>
+        <!-- Pagination (Static) -->
+        <nav aria-label="Games pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link bg-dark text-white border-dark" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link bg-danger border-danger" href="#">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white border-dark" href="#">2</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white border-dark" href="#">3</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link bg-dark text-white border-dark" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </main>
 
-
-<footer class="footer">
+<!-- Footer -->
+<footer class="bg-dark text-white py-5 mt-5">
     <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>About</h4>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <h4 class="text-danger">About</h4>
                 <p>Souls-like Games - your guide to the world of hardcore games</p>
             </div>
-            <div class="footer-section">
-                <h4>Navigation</h4>
-                <ul class="footer-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="library.html">Library</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
+            <div class="col-md-6 col-lg-3">
+                <h4 class="text-danger">Navigation</h4>
+                <ul class="list-unstyled">
+                    <li><a href="index.html" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="library.html" class="text-white text-decoration-none">Library</a></li>
+                    <li><a href="about.html" class="text-white text-decoration-none">About</a></li>
+                    <li><a href="contact.html" class="text-white text-decoration-none">Contact</a></li>
                 </ul>
             </div>
-            <div class="footer-section">
-                <h4>Team Hollows</h4>
-                <p class="team-members">Team Members: Mukhidinov Nursultan, Baltin Bakhtiyar</p>
+            <div class="col-md-6 col-lg-3">
+                <h4 class="text-danger">Team Hollows</h4>
+                <p>Team Members: Mukhidinov Nursultan, Baltin Bakhtiyar</p>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <h4 class="text-danger">Statistics</h4>
+                <p><strong>12+</strong> Games in Library</p>
+                <p><strong>50+</strong> Boss Guides</p>
+                <p><strong>1000+</strong> Community Members</p>
             </div>
         </div>
-        <div class="footer-bottom">
+        <div class="text-center mt-4 pt-4 border-top border-secondary">
             <p>&copy; 2025 Souls-like Games. All rights reserved.</p>
         </div>
     </div>
 </footer>
+
+<!-- Bootstrap JS (только для компонентов Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
