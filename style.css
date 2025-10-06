@@ -70,7 +70,7 @@ h1, .display-1, .display-2, .display-3 {
 /* Hero Section */
 .hero-section {
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url('https://p325k7wa.twic.pics/high/dark-souls/dark-souls-3/00-page-setup/ds3_game-thumbnail.jpg?twic=v1/resize=1200/step=10/quality=80') center/cover fixed;
+    url('https://www.creativefabrica.com/wp-content/uploads/2022/10/03/Red-Skull-with-Horn-Illustration-Graphics-39929366-1.jpg') center/cover fixed;
     position: relative;
     min-height: 100vh;
     display: flex;
@@ -957,4 +957,5 @@ footer::before {
 .column-gap-2 { column-gap: 0.5rem; }
 .column-gap-3 { column-gap: 1rem; }
 .column-gap-4 { column-gap: 1.5rem; }
+
 .column-gap-5 { column-gap: 3rem; }
