@@ -1,18 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><!DOCTYPE html>
-    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Souls-like Games - Contact</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Popup Form Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .popup-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2a2a2a;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 9999;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .popup-form.show,
+        .popup-overlay.show {
+            display: block;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            color: #dc3545;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .popup-close:hover {
+            transform: rotate(90deg);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        /* Form validation styles */
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .form-control.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .form-control.success {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+        }
+        
+        /* Date time display */
+        #datetime-display {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+        
+        /* Color change button */
+        #color-change-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        #color-change-btn:hover {
+            transform: scale(1.1) rotate(360deg);
+        }
+    </style>
+</head>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Souls-like Games - Contact</title>
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="style.css">
-    </head>
-
-    <body>
+<body>
     <!-- Task 5: Bootstrap Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
@@ -42,6 +155,9 @@
     <main class="contact-main pt-5 mt-5">
         <div class="container">
             <h1 class="text-center text-danger display-3 mb-5">Contact Us</h1>
+            
+            <!-- Task 5: Current Date and Time Display -->
+            <div id="datetime-display"></div>
 
             <div class="row g-5">
                 <div class="col-lg-6">
@@ -61,16 +177,10 @@
                             </div>
 
                             <div class="contact-item">
-                                <h3 class="text-danger">Social Media</h3>
-                                <div class="social-links">
-                                    <!-- Task 6: Bootstrap Buttons -->
-                                    <div class="btn-group-vertical w-100">
-                                        <button class="btn btn-outline-light text-start">Twitter</button>
-                                        <button class="btn btn-outline-light text-start">Instagram</button>
-                                        <button class="btn btn-outline-light text-start">YouTube</button>
-                                        <button class="btn btn-outline-light text-start">Reddit</button>
-                                    </div>
-                                </div>
+                                <h3 class="text-danger">Newsletter</h3>
+                                <!-- Task 3: Button to trigger popup -->
+                                <button id="subscribe-btn" class="btn btn-danger w-100 mb-3">Subscribe to Newsletter</button>
+                                <p class="text-muted small">Get weekly updates about new souls-like games!</p>
                             </div>
                         </div>
                     </div>
@@ -79,21 +189,35 @@
                 <div class="col-lg-6">
                     <div class="p-4 bg-secondary text-white rounded shadow h-100">
                         <h2 class="text-danger mb-4">Send us a Message</h2>
-                        <!-- Task 9: Responsive Form Design -->
-                        <form class="contact-form" action="contact.html" method="GET">
+                        <!-- Task 1: Form with Validation -->
+                        <form class="contact-form" id="contact-form" novalidate>
                             <div class="mb-3">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control bg-dark text-white border-dark" id="name" name="name" placeholder="Enter your name" required>
+                                <label for="name" class="form-label">Your Name *</label>
+                                <input type="text" class="form-control bg-dark text-white border-dark" id="name" name="name" placeholder="Enter your name">
+                                <div class="error-message" id="name-error">Name is required and must be at least 2 characters</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="email" class="form-label">Your Email</label>
-                                <input type="email" class="form-control bg-dark text-white border-dark" id="email" name="email" placeholder="Enter your email" required>
+                                <label for="email" class="form-label">Your Email *</label>
+                                <input type="email" class="form-control bg-dark text-white border-dark" id="email" name="email" placeholder="Enter your email">
+                                <div class="error-message" id="email-error">Please enter a valid email address</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="subject" class="form-label">Subject</label>
-                                <select class="form-select bg-dark text-white border-dark" id="subject" name="subject" required>
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control bg-dark text-white border-dark" id="password" name="password" placeholder="Create a password (min 8 characters)">
+                                <div class="error-message" id="password-error">Password must be at least 8 characters</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                                <input type="password" class="form-control bg-dark text-white border-dark" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+                                <div class="error-message" id="confirmPassword-error">Passwords do not match</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <select class="form-select bg-dark text-white border-dark" id="subject" name="subject">
                                     <option value="">Select a subject</option>
                                     <option value="suggestion">Game Suggestion</option>
                                     <option value="question">Question</option>
@@ -101,14 +225,15 @@
                                     <option value="technical">Technical Issue</option>
                                     <option value="other">Other</option>
                                 </select>
+                                <div class="error-message" id="subject-error">Please select a subject</div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="message" class="form-label">Your Message</label>
-                                <textarea class="form-control bg-dark text-white border-dark" id="message" name="message" rows="5" placeholder="Type your message here..." required></textarea>
+                                <label for="message" class="form-label">Your Message *</label>
+                                <textarea class="form-control bg-dark text-white border-dark" id="message" name="message" rows="5" placeholder="Type your message here..."></textarea>
+                                <div class="error-message" id="message-error">Message must be at least 10 characters</div>
                             </div>
 
-                            <!-- Task 6: Bootstrap Buttons -->
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-danger btn-lg">Send Message</button>
                             </div>
@@ -118,6 +243,50 @@
             </div>
         </div>
     </main>
+
+    <!-- Task 3: Popup Subscription Form -->
+    <div class="popup-overlay" id="popup-overlay"></div>
+    <div class="popup-form" id="popup-form">
+        <span class="popup-close" id="popup-close">&times;</span>
+        <h3 class="text-danger mb-4">Subscribe to Our Newsletter</h3>
+        <form id="subscription-form">
+            <div class="mb-3">
+                <label for="sub-name" class="form-label text-white">Your Name</label>
+                <input type="text" class="form-control bg-dark text-white border-dark" id="sub-name" placeholder="Enter your name">
+            </div>
+            <div class="mb-3">
+                <label for="sub-email" class="form-label text-white">Your Email</label>
+                <input type="email" class="form-control bg-dark text-white border-dark" id="sub-email" placeholder="Enter your email">
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-white">Interested in:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="news" checked>
+                    <label class="form-check-label text-white" for="news">
+                        Game News & Updates
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="guides">
+                    <label class="form-check-label text-white" for="guides">
+                        Strategy Guides
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="reviews">
+                    <label class="form-check-label text-white" for="reviews">
+                        Game Reviews
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-danger w-100">Subscribe Now</button>
+        </form>
+    </div>
+
+    <!-- Task 4: Change Background Color Button -->
+    <button id="color-change-btn" class="btn btn-danger" title="Change background color">
+        🎨
+    </button>
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-5 mt-5">
@@ -149,6 +318,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-
-    </html>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

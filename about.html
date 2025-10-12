@@ -8,6 +8,108 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Task 2: Accordion Styles */
+        .accordion-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .accordion-item {
+            background: #2a2a2a;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-item:hover {
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2);
+        }
+        
+        .accordion-header {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 1.25rem;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+        }
+        
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #2a2a2a, #333);
+        }
+        
+        .accordion-item.active .accordion-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .accordion-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .accordion-item.active .accordion-icon {
+            transform: rotate(45deg);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            background: #1a1a1a;
+            color: #b0b0b0;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            padding: 0 1rem;
+        }
+        
+        .accordion-item.active .accordion-content {
+            padding: 1rem;
+        }
+        
+        /* Date time display */
+        #datetime-display {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+        
+        /* Color change button */
+        #color-change-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        #color-change-btn:hover {
+            transform: scale(1.1) rotate(360deg);
+        }
+    </style>
 </head>
 
 <body>
@@ -40,6 +142,9 @@
 <main class="about-main pt-5 mt-5">
     <div class="container">
         <h1 class="text-center text-danger display-3 mb-5">About Souls-like Games</h1>
+        
+        <!-- Task 5: Current Date and Time Display -->
+        <div id="datetime-display"></div>
 
         <!-- Task 3: Bootstrap Grid Layout -->
         <section class="mb-5">
@@ -57,9 +162,8 @@
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="#origin" class="text-white text-decoration-none">Origin Story</a></li>
                             <li class="mb-2"><a href="#gameplay" class="text-white text-decoration-none">Gameplay Mechanics</a></li>
-                            <li class="mb-2"><a href="#evolution" class="text-white text-decoration-none">Genre Evolution</a></li>
+                            <li class="mb-2"><a href="#faq" class="text-white text-decoration-none">Frequently Asked Questions</a></li>
                             <li class="mb-2"><a href="#team" class="text-white text-decoration-none">Our Team</a></li>
-                            <li class="mb-2"><a href="#features" class="text-white text-decoration-none">Key Features</a></li>
                         </ul>
                     </div>
                 </div>
@@ -74,18 +178,13 @@
                         <article id="gameplay" class="mb-4">
                             <h3 class="text-danger">Core Gameplay Elements</h3>
                             <ul class="list-unstyled">
-                                <li class="mb-2">✓ High difficulty with punishment for mistakes</li>
-                                <li class="mb-2">✓ Checkpoint system (bonfires in Dark Souls)</li>
-                                <li class="mb-2">✓ Retrieval of lost resources upon death</li>
-                                <li class="mb-2">✓ Environmental storytelling</li>
-                                <li class="mb-2">✓ Interconnected world design</li>
-                                <li class="mb-2">✓ Tactical, stamina-based combat</li>
+                                <li class="mb-2">✔ High difficulty with punishment for mistakes</li>
+                                <li class="mb-2">✔ Checkpoint system (bonfires in Dark Souls)</li>
+                                <li class="mb-2">✔ Retrieval of lost resources upon death</li>
+                                <li class="mb-2">✔ Environmental storytelling</li>
+                                <li class="mb-2">✔ Interconnected world design</li>
+                                <li class="mb-2">✔ Tactical, stamina-based combat</li>
                             </ul>
-                        </article>
-
-                        <article id="evolution">
-                            <h3 class="text-danger">Evolution of the Genre</h3>
-                            <p>From its beginnings with Demon's Souls in 2009, the genre has expanded to include various interpretations across different styles including 2D platformers, metroidvanias, and even anime-inspired titles. The success of Elden Ring in 2022 demonstrated the mainstream appeal of these challenging games.</p>
                         </article>
                     </div>
                 </div>
@@ -99,18 +198,104 @@
             </div>
         </section>
 
+        <!-- Task 2: FAQ Accordion Section -->
+        <section id="faq" class="mb-5">
+            <h2 class="text-center text-danger mb-5 display-4">Frequently Asked Questions</h2>
+            <div class="accordion-container">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">What exactly makes a game "Souls-like"?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Souls-like games are characterized by several key features: challenging difficulty that requires patience and skill, a stamina-based combat system that punishes button mashing, the loss of currency/experience upon death with one chance to retrieve it, interconnected world design with shortcuts that loop back, minimal hand-holding with environmental storytelling, and boss battles that require pattern recognition and precise timing.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">Which game should I start with as a beginner?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>For beginners, we recommend starting with either Dark Souls Remastered for the classic experience, or Elden Ring for a more modern and accessible entry point. Elden Ring offers more flexibility with its open world design, allowing you to explore elsewhere if you're stuck. Alternatively, Code Vein provides an anime-styled souls-like with slightly more forgiving mechanics and AI companions to help you.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">Are all Souls-like games extremely difficult?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>While difficulty is a hallmark of the genre, not all souls-likes are equally punishing. Games like Code Vein and Mortal Shell offer more accessible experiences, while titles like Sekiro and Nioh 2 are considered among the most challenging. Many modern souls-likes also include difficulty options or assist modes. The key is that these games reward patience, observation, and skill improvement rather than raw reflexes alone.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">What's the difference between Souls-like and Soulsborne?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>"Soulsborne" specifically refers to FromSoftware's games: the Dark Souls series, Bloodborne, Sekiro, and Elden Ring. "Souls-like" is the broader term for any game that follows the design philosophy established by these titles, including games from other developers like Hollow Knight, Salt and Sanctuary, and Lies of P. All Soulsborne games are souls-likes, but not all souls-likes are Soulsborne games.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">Do I need to play these games in any particular order?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Most souls-like games are standalone experiences with their own worlds and stories. While the Dark Souls trilogy shares a connected universe, you can start with any game. Each title tells its story through environmental details and item descriptions rather than traditional cutscenes, so you won't be lost jumping into any entry. However, playing Dark Souls 1 before 3 can enhance your appreciation of certain callbacks and references.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">What's the appeal of such challenging games?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>The appeal lies in the sense of genuine accomplishment. Unlike many modern games that guide players extensively, souls-likes respect player intelligence and skill. Every victory feels earned, not given. The games create memorable moments through challenge - defeating a tough boss after multiple attempts creates a rush that easier games can't replicate. Additionally, the mysterious storytelling, atmospheric worlds, and tight gameplay mechanics create an immersive experience that rewards dedication.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">Are there any 2D souls-like games?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Yes! The souls-like formula translates excellently to 2D. Notable examples include Hollow Knight (a metroidvania with souls-like difficulty and mechanics), Salt and Sanctuary (essentially 2D Dark Souls), Blasphemous (gothic religious horror), and Dead Cells (roguelike souls-like). These games maintain the challenging combat, atmospheric storytelling, and death mechanics while adding platforming elements.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h3 class="accordion-title">Can I play souls-like games cooperatively?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Many souls-like games offer cooperative multiplayer features. Dark Souls, Elden Ring, and Code Vein allow you to summon other players or NPCs to help with challenging areas and bosses. However, this usually comes with trade-offs like increased boss health or invasion risks. Some games like Salt and Sanctuary and Outward offer full co-op campaigns. The co-op features vary by game, so check each title's specific multiplayer options.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- About Content -->
         <div class="row g-5 mb-5">
             <div class="col-lg-6">
                 <img src="https://cdn.donmai.us/original/0c/c4/__hunter_ashen_one_and_soul_of_cinder_dark_souls_and_3_more_drawn_by_stu_dts__0cc4d3b291d298d61380745fc449f95d.jpg"
                      alt="Souls-like games collage" class="img-fluid rounded shadow">
             </div>
-            <div class="col-lg-6" id="features">
-                <h2 class="text-danger mb-4">What Makes a Game "Souls-like"?</h2>
-                <p class="mb-4">Souls-like games are characterized by their uncompromising difficulty, deep lore, and rewarding gameplay loop. Players are expected to learn from their mistakes and overcome challenges through perseverance and skill.</p>
-
+            <div class="col-lg-6">
                 <h2 class="text-danger mb-4">Community and Culture</h2>
                 <p>The Souls-like community is known for its dedication and helpfulness. From message systems that allow players to leave tips for one another to cooperative multiplayer features, these games foster a unique sense of camaraderie among players facing similar challenges.</p>
+                
+                <h2 class="text-danger mb-4 mt-4">The Philosophy of Challenge</h2>
+                <p>Souls-like games represent a philosophy: that overcoming genuine difficulty creates more meaningful experiences than effortless victory. They trust players to learn, adapt, and improve rather than lowering the bar. This respect for player capability has resonated with millions worldwide.</p>
             </div>
         </div>
 
@@ -125,7 +310,6 @@
                                  alt="Team Member 1" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                             <h3 class="card-title text-danger">Mukhidinov Nursultan</h3>
                             <p class="card-text">Lead Developer & Souls-like Expert</p>
-                            <!-- Task 6: Bootstrap Buttons -->
                             <div class="btn-group mt-3">
                                 <button class="btn btn-outline-light">Contact</button>
                                 <button class="btn btn-danger">Profile</button>
@@ -140,7 +324,6 @@
                                  alt="Team Member 2" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                             <h3 class="card-title text-danger">Baltin Bakhtiyar</h3>
                             <p class="card-text">Content Creator & Game Analyst</p>
-                            <!-- Task 6: Bootstrap Buttons -->
                             <div class="btn-group mt-3">
                                 <button class="btn btn-outline-light">Contact</button>
                                 <button class="btn btn-danger">Profile</button>
@@ -152,6 +335,11 @@
         </div>
     </div>
 </main>
+
+<!-- Task 4: Change Background Color Button -->
+<button id="color-change-btn" class="btn btn-danger" title="Change background color">
+    🎨
+</button>
 
 <!-- Footer -->
 <footer class="bg-dark text-white py-5">
@@ -183,6 +371,8 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JavaScript -->
+<script src="script.js"></script>
 </body>
 
 </html>
