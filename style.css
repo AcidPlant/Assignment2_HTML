@@ -69,7 +69,7 @@ h1, .display-1, .display-2, .display-3 {
 /* Hero Section */
 .hero-section {
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url('https://www.creativefabrica.com/wp-content/uploads/2022/10/03/Red-Skull-with-Horn-Illustration-Graphics-39929366-1.jpg') center/cover fixed;
+    url('https://st.overclockers.ru/images/lab/2016/04/20/1/001_content_big.jpg') center/cover fixed;
     position: relative;
     min-height: 100vh;
     display: flex;
