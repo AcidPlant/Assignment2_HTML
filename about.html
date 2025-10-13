@@ -8,108 +8,6 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Task 2: Accordion Styles */
-        .accordion-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem 0;
-        }
-        
-        .accordion-item {
-            background: #2a2a2a;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .accordion-item:hover {
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2);
-        }
-        
-        .accordion-header {
-            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-            padding: 1.25rem;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-            color: #e0e0e0;
-        }
-        
-        .accordion-header:hover {
-            background: linear-gradient(135deg, #2a2a2a, #333);
-        }
-        
-        .accordion-item.active .accordion-header {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-        }
-        
-        .accordion-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .accordion-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-        
-        .accordion-item.active .accordion-icon {
-            transform: rotate(45deg);
-        }
-        
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            background: #1a1a1a;
-            color: #b0b0b0;
-            transition: max-height 0.4s ease, padding 0.4s ease;
-            padding: 0 1rem;
-        }
-        
-        .accordion-item.active .accordion-content {
-            padding: 1rem;
-        }
-        
-        /* Date time display */
-        #datetime-display {
-            background: rgba(220, 53, 69, 0.1);
-            border: 2px solid #dc3545;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-            color: #e0e0e0;
-        }
-        
-        /* Color change button */
-        #color-change-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        #color-change-btn:hover {
-            transform: scale(1.1) rotate(360deg);
-        }
-    </style>
 </head>
 
 <body>
@@ -142,7 +40,7 @@
 <main class="about-main pt-5 mt-5">
     <div class="container">
         <h1 class="text-center text-danger display-3 mb-5">About Souls-like Games</h1>
-        
+
         <!-- Task 5: Current Date and Time Display -->
         <div id="datetime-display"></div>
 
@@ -293,7 +191,7 @@
             <div class="col-lg-6">
                 <h2 class="text-danger mb-4">Community and Culture</h2>
                 <p>The Souls-like community is known for its dedication and helpfulness. From message systems that allow players to leave tips for one another to cooperative multiplayer features, these games foster a unique sense of camaraderie among players facing similar challenges.</p>
-                
+
                 <h2 class="text-danger mb-4 mt-4">The Philosophy of Challenge</h2>
                 <p>Souls-like games represent a philosophy: that overcoming genuine difficulty creates more meaningful experiences than effortless victory. They trust players to learn, adapt, and improve rather than lowering the bar. This respect for player capability has resonated with millions worldwide.</p>
             </div>
@@ -307,7 +205,7 @@
                     <div class="card bg-secondary text-white text-center shadow">
                         <div class="card-body">
                             <img src="https://i.pinimg.com/736x/73/e9/24/73e924f47e89312f793f6262ab68f797.jpg"
-                                 alt="Team Member 1" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                 alt="Team Member 1" class="rounded-circle mb-3">
                             <h3 class="card-title text-danger">Mukhidinov Nursultan</h3>
                             <p class="card-text">Lead Developer & Souls-like Expert</p>
                             <div class="btn-group mt-3">
@@ -321,7 +219,7 @@
                     <div class="card bg-secondary text-white text-center shadow">
                         <div class="card-body">
                             <img src="https://media.gq-magazine.co.uk/photos/5d138da5d7a7010d5bbb99a4/1:1/w_1280,h_1280,c_limit/dark_souls_remastered_crop.jpg"
-                                 alt="Team Member 2" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                 alt="Team Member 2" class="rounded-circle mb-3">
                             <h3 class="card-title text-danger">Baltin Bakhtiyar</h3>
                             <p class="card-text">Content Creator & Game Analyst</p>
                             <div class="btn-group mt-3">
@@ -376,4 +274,3 @@
 </body>
 
 </html>
-

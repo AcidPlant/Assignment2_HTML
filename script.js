@@ -1,20 +1,20 @@
 // Task 5: Display Current Date and Time
 function updateDateTime() {
     const now = new Date();
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: true
     };
-    
+
     const formattedDate = now.toLocaleDateString('en-US', options);
     const datetimeDisplay = document.getElementById('datetime-display');
-    
+
     if (datetimeDisplay) {
         datetimeDisplay.innerHTML = `
             <div>📅 Current Date & Time</div>
@@ -30,16 +30,16 @@ updateDateTime(); // Initial call
 // Task 1: Form Validation
 document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contact-form');
-    
+
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             // Reset previous errors
             resetErrors();
-            
+
             let isValid = true;
-            
+
             // Validate Name
             const name = document.getElementById('name');
             if (!name.value.trim() || name.value.trim().length < 2) {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('name');
             }
-            
+
             // Validate Email
             const email = document.getElementById('email');
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('email');
             }
-            
+
             // Validate Password
             const password = document.getElementById('password');
             if (!password.value || password.value.length < 8) {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('password');
             }
-            
+
             // Validate Password Confirmation
             const confirmPassword = document.getElementById('confirmPassword');
             if (!confirmPassword.value || confirmPassword.value !== password.value) {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('confirmPassword');
             }
-            
+
             // Validate Subject
             const subject = document.getElementById('subject');
             if (!subject.value) {
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('subject');
             }
-            
+
             // Validate Message
             const message = document.getElementById('message');
             if (!message.value.trim() || message.value.trim().length < 10) {
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showSuccess('message');
             }
-            
+
             // If form is valid, show success message
             if (isValid) {
                 alert('Form submitted successfully! Thank you for contacting us.');
@@ -108,12 +108,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function showError(fieldId, errorMessage) {
     const field = document.getElementById(fieldId);
     const errorElement = document.getElementById(fieldId + '-error');
-    
+
     if (field) {
         field.classList.add('error');
         field.classList.remove('success');
     }
-    
+
     if (errorElement) {
         errorElement.textContent = errorMessage;
         errorElement.style.display = 'block';
@@ -123,12 +123,12 @@ function showError(fieldId, errorMessage) {
 function showSuccess(fieldId) {
     const field = document.getElementById(fieldId);
     const errorElement = document.getElementById(fieldId + '-error');
-    
+
     if (field) {
         field.classList.add('success');
         field.classList.remove('error');
     }
-    
+
     if (errorElement) {
         errorElement.style.display = 'none';
     }
@@ -137,11 +137,11 @@ function showSuccess(fieldId) {
 function resetErrors() {
     const errorMessages = document.querySelectorAll('.error-message');
     const formControls = document.querySelectorAll('.form-control, .form-select');
-    
+
     errorMessages.forEach(error => {
         error.style.display = 'none';
     });
-    
+
     formControls.forEach(control => {
         control.classList.remove('error', 'success');
     });
@@ -175,10 +175,10 @@ if (popupOverlay) {
 if (subscriptionForm) {
     subscriptionForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const subName = document.getElementById('sub-name').value;
         const subEmail = document.getElementById('sub-email').value;
-        
+
         if (subName && subEmail) {
             alert(`Thank you for subscribing, ${subName}! We'll send updates to ${subEmail}.`);
             subscriptionForm.reset();
@@ -219,7 +219,7 @@ if (colorChangeBtn) {
         currentColorIndex = (currentColorIndex + 1) % colors.length;
         document.body.style.transition = 'background-color 0.5s ease';
         document.body.style.backgroundColor = colors[currentColorIndex];
-        
+
         // Add rotation animation to button
         this.style.transform = 'scale(1.1) rotate(360deg)';
         setTimeout(() => {
@@ -231,15 +231,15 @@ if (colorChangeBtn) {
 // Task 2: Accordion for FAQs
 function initAccordion() {
     const accordionItems = document.querySelectorAll('.accordion-item');
-    
+
     accordionItems.forEach(item => {
         const header = item.querySelector('.accordion-header');
         const content = item.querySelector('.accordion-content');
-        
+
         if (header && content) {
             header.addEventListener('click', function() {
                 const isActive = item.classList.contains('active');
-                
+
                 // Close all accordion items
                 accordionItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
@@ -249,7 +249,7 @@ function initAccordion() {
                         otherContent.style.padding = '0 1rem';
                     }
                 });
-                
+
                 // Toggle current item
                 if (!isActive) {
                     item.classList.add('active');
