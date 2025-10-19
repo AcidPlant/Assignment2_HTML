@@ -33,6 +33,14 @@
                     <a class="nav-link" href="contact.html">Contact</a>
                 </li>
             </ul>
+            <!-- Language Selector -->
+            <div class="language-selector ms-3">
+                <select id="language-select" class="form-select form-select-sm bg-dark text-white border-dark">
+                    <option value="en">English</option>
+                    <option value="kk">Қазақша</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
         </div>
     </div>
 </nav>
@@ -40,6 +48,23 @@
 <main class="library-main pt-5 mt-5">
     <div class="container">
         <h1 class="text-center text-danger display-3 mb-5">Souls-like Games Library</h1>
+
+        <!-- Game Filtering System -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="p-3 bg-secondary rounded shadow">
+                    <h4 class="text-danger mb-3">Filter Games</h4>
+                    <div class="btn-group flex-wrap" role="group">
+                        <button type="button" class="btn btn-outline-light filter-btn active" data-filter="all">All Games</button>
+                        <button type="button" class="btn btn-outline-light filter-btn" data-filter="3d">3D Action</button>
+                        <button type="button" class="btn btn-outline-light filter-btn" data-filter="metroidvania">Metroidvania</button>
+                        <button type="button" class="btn btn-outline-light filter-btn" data-filter="anime">Anime</button>
+                        <button type="button" class="btn btn-outline-light filter-btn" data-filter="platformer">Platformer</button>
+                        <button type="button" class="btn btn-outline-light filter-btn" data-filter="open-world">Open World</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Task 9: Responsive Form Design -->
         <div class="row justify-content-center mb-5">
@@ -153,7 +178,7 @@
             <h2 class="text-center text-danger mb-4 display-4">All Games Collection</h2>
             <div class="row g-4">
                 <!-- Game 1 - Dark Souls III -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://upload.wikimedia.org/wikipedia/ru/b/bb/Dark_souls_3_cover_art.jpg" class="card-img-top" alt="Dark Souls III">
                         <div class="card-body d-flex flex-column">
@@ -171,7 +196,7 @@
                 </div>
 
                 <!-- Game 2 - Hollow Knight -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="metroidvania">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Hollow_Knight_first_cover_art.webp/250px-Hollow_Knight_first_cover_art.webp.png" class="card-img-top" alt="Hollow Knight">
                         <div class="card-body d-flex flex-column">
@@ -189,7 +214,7 @@
                 </div>
 
                 <!-- Game 3 - Code Vein -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="anime">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://igm.gg/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Figm-s3%2FPROD%2F202408%2F5cbad147%2FCODE_VEIN_2_11zon.png&w=640&q=75" class="card-img-top" alt="Code Vein">
                         <div class="card-body d-flex flex-column">
@@ -207,7 +232,7 @@
                 </div>
 
                 <!-- Game 4 - Blasphemous -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="platformer">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://korobok.store/upload/iblock/596/hf2hbwwfovu1f9iyko2bw0ufx15g52cq.webp" class="card-img-top" alt="Blasphemous">
                         <div class="card-body d-flex flex-column">
@@ -225,7 +250,7 @@
                 </div>
 
                 <!-- Game 5 - Sekiro -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://blog.allo.ua/wp-content/uploads/2019/02/MyCollages1-1.jpg" class="card-img-top" alt="Sekiro">
                         <div class="card-body d-flex flex-column">
@@ -243,7 +268,7 @@
                 </div>
 
                 <!-- Game 6 - Elden Ring -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="open-world">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/7/7c/Elden_Ring_-_cover.jpg/330px-Elden_Ring_-_cover.jpg" class="card-img-top" alt="Elden Ring">
                         <div class="card-body d-flex flex-column">
@@ -261,7 +286,7 @@
                 </div>
 
                 <!-- Game 7 - Salt and Sanctuary -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="metroidvania">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_SaltAndSanctuary.jpg" class="card-img-top" alt="Salt and Sanctuary">
                         <div class="card-body d-flex flex-column">
@@ -279,7 +304,7 @@
                 </div>
 
                 <!-- Game 8 - Nioh 2 -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="anime">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://upload.wikimedia.org/wikipedia/ru/1/1f/Nioh_2_%28%D0%BE%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0%29.jpg" class="card-img-top" alt="Nioh 2">
                         <div class="card-body d-flex flex-column">
@@ -297,7 +322,7 @@
                 </div>
 
                 <!-- Game 9 - Dark Souls Remastered -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://www.technodom.kz/under/tab_showcase/141217/1.jpg" class="card-img-top" alt="Dark Souls Remastered">
                         <div class="card-body d-flex flex-column">
@@ -315,7 +340,7 @@
                 </div>
 
                 <!-- Game 10 - Bloodborne -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://korobok.store/upload/iblock/cc9/jxy5ave3brycb8btec9i4ut8v6hsszee.webp" class="card-img-top" alt="Bloodborne">
                         <div class="card-body d-flex flex-column">
@@ -333,7 +358,7 @@
                 </div>
 
                 <!-- Game 11 - Mortal Shell -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://theeliteinstitute.net/wp-content/uploads/2022/12/image_2022-12-27_103231182-1200x640.png" class="card-img-top" alt="Mortal Shell">
                         <div class="card-body d-flex flex-column">
@@ -351,7 +376,7 @@
                 </div>
 
                 <!-- Game 12 - Lies of P -->
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 game-card" data-category="3d">
                     <div class="card bg-secondary text-white h-100 shadow">
                         <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1627720/capsule_616x353.jpg?t=1754552654" class="card-img-top" alt="Lies of P">
                         <div class="card-body d-flex flex-column">
@@ -429,6 +454,7 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 </body>
 
 </html>

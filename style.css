@@ -27,6 +27,7 @@ body {
     background-color: var(--dark-bg);
     color: var(--text-light);
     min-height: 100vh;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Task 1: Responsive Typography */
@@ -144,6 +145,16 @@ h1, .display-1, .display-2, .display-3 {
     background: rgba(220, 53, 69, 0.1);
 }
 
+/* Language Selector */
+.language-selector {
+    margin-left: 1rem;
+}
+
+.language-selector .form-select {
+    width: auto;
+    min-width: 120px;
+}
+
 /* Custom Card Styles */
 .card {
     border: none;
@@ -243,6 +254,13 @@ h1, .display-1, .display-2, .display-3 {
     background-color: rgba(255, 255, 255, 0.1);
     border-color: var(--text-light);
     transform: translateY(-2px);
+}
+
+.btn-outline-warning.active,
+.btn-outline-primary.active {
+    background-color: var(--accent-red);
+    border-color: var(--accent-red);
+    color: white;
 }
 
 /* Button Groups */
@@ -366,6 +384,27 @@ h1, .display-1, .display-2, .display-3 {
     box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
 }
 
+/* Multi-step Form */
+.form-step {
+    display: none;
+    animation: slideIn 0.5s ease-out;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.progress {
+    height: 8px;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
 /* Color change button */
 #color-change-btn {
     position: fixed;
@@ -408,7 +447,7 @@ h1, .display-1, .display-2, .display-3 {
 .contact-main {
     padding-top: 100px;
     min-height: 100vh;
-    background: inherit; /* Наследует фон от body */
+    background: inherit;
 }
 
 /* Section Styling */
@@ -577,6 +616,22 @@ footer::before {
     margin-bottom: 1rem;
 }
 
+/* Game Filtering */
+.filter-btn {
+    transition: all 0.3s ease;
+    margin: 0.2rem;
+}
+
+.filter-btn.active {
+    background-color: var(--accent-red) !important;
+    border-color: var(--accent-red) !important;
+    color: white !important;
+}
+
+.game-card {
+    transition: all 0.3s ease;
+}
+
 /* Badge Styles */
 .badge {
     font-weight: 500;
@@ -618,6 +673,11 @@ footer::before {
 }
 
 /* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -629,7 +689,7 @@ footer::before {
     }
 }
 
-@keyframes slideInLeft {
+@keyframes slideIn {
     from {
         opacity: 0;
         transform: translateX(-40px);
@@ -651,12 +711,16 @@ footer::before {
     }
 }
 
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
 .fade-in-up {
     animation: fadeInUp 0.8s ease-out;
 }
 
-.slide-in-left {
-    animation: slideInLeft 0.8s ease-out;
+.slide-in {
+    animation: slideIn 0.8s ease-out;
 }
 
 .slide-in-right {
@@ -677,6 +741,24 @@ footer::before {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Rating Stars */
+.rating-stars {
+    font-size: 2.5rem;
+    cursor: pointer;
+    text-align: center;
+}
+
+.star {
+    transition: all 0.3s ease;
+    margin: 0 5px;
+    display: inline-block;
+    color: #666;
+}
+
+.star:hover {
+    transform: scale(1.3);
 }
 
 /* Accordion Styles */
@@ -795,34 +877,6 @@ footer::before {
     transform: rotate(90deg);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -60%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-}
-
-/* Date time display */
-#datetime-display {
-    background: rgba(220, 53, 69, 0.1);
-    border: 2px solid #dc3545;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-    color: #e0e0e0;
-}
-
 /* Utility Classes */
 .text-gradient {
     background: linear-gradient(135deg, var(--accent-red), #ff6b6b);
@@ -902,6 +956,18 @@ footer::before {
         bottom: 15px;
         right: 15px;
     }
+
+    .rating-stars {
+        font-size: 2rem;
+    }
+
+    .language-selector {
+        margin-left: 0.5rem;
+    }
+
+    .language-selector .form-select {
+        min-width: 100px;
+    }
 }
 
 /* High contrast mode support */
@@ -934,7 +1000,8 @@ footer::before {
     footer,
     .btn,
     .carousel,
-    .search-form {
+    .search-form,
+    #color-change-btn {
         display: none !important;
     }
 

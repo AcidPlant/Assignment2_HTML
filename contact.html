@@ -32,6 +32,14 @@
                     <a class="nav-link active" href="contact.html">Contact</a>
                 </li>
             </ul>
+            <!-- Language Selector -->
+            <div class="language-selector ms-3">
+                <select id="language-select" class="form-select form-select-sm bg-dark text-white border-dark">
+                    <option value="en">English</option>
+                    <option value="kk">Қазақша</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
         </div>
     </div>
 </nav>
@@ -73,53 +81,80 @@
             <div class="col-lg-6">
                 <div class="p-4 bg-secondary text-white rounded shadow h-100">
                     <h2 class="text-danger mb-4">Send us a Message</h2>
-                    <!-- Task 1: Form with Validation -->
+
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4 bg-dark">
+                        <div id="form-progress" class="progress-bar bg-danger" style="width: 0%"></div>
+                    </div>
+
+                    <!-- Multi-step Form -->
                     <form class="contact-form" id="contact-form" novalidate>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Your Name *</label>
-                            <input type="text" class="form-control bg-dark text-white border-dark" id="name" name="name" placeholder="Enter your name">
-                            <div class="error-message" id="name-error">Name is required and must be at least 2 characters</div>
+                        <!-- Step 1: Personal Info -->
+                        <div class="form-step active" id="step-1">
+                            <h4 class="text-warning mb-3">Step 1: Your Information</h4>
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name *</label>
+                                <input type="text" class="form-control bg-dark text-white border-dark" id="name" name="name" placeholder="Enter your name">
+                                <div class="error-message" id="name-error">Name is required and must be at least 2 characters</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Your Email *</label>
+                                <input type="email" class="form-control bg-dark text-white border-dark" id="email" name="email" placeholder="Enter your email">
+                                <div class="error-message" id="email-error">Please enter a valid email address</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-danger next-step">Next →</button>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Your Email *</label>
-                            <input type="email" class="form-control bg-dark text-white border-dark" id="email" name="email" placeholder="Enter your email">
-                            <div class="error-message" id="email-error">Please enter a valid email address</div>
+                        <!-- Step 2: Message Details -->
+                        <div class="form-step" id="step-2">
+                            <h4 class="text-warning mb-3">Step 2: Message Details</h4>
+
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <select class="form-select bg-dark text-white border-dark" id="subject" name="subject">
+                                    <option value="">Select a subject</option>
+                                    <option value="suggestion">Game Suggestion</option>
+                                    <option value="question">Question</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="technical">Technical Issue</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="error-message" id="subject-error">Please select a subject</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="message" class="form-label">Your Message *</label>
+                                <textarea class="form-control bg-dark text-white border-dark" id="message" name="message" rows="5" placeholder="Type your message here..."></textarea>
+                                <div class="error-message" id="message-error">Message must be at least 10 characters</div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-light prev-step">← Back</button>
+                                <button type="button" class="btn btn-danger next-step">Next →</button>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password *</label>
-                            <input type="password" class="form-control bg-dark text-white border-dark" id="password" name="password" placeholder="Create a password (min 8 characters)">
-                            <div class="error-message" id="password-error">Password must be at least 8 characters</div>
-                        </div>
+                        <!-- Step 3: Review & Submit -->
+                        <div class="form-step" id="step-3">
+                            <h4 class="text-warning mb-3">Step 3: Review & Submit</h4>
 
-                        <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Confirm Password *</label>
-                            <input type="password" class="form-control bg-dark text-white border-dark" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
-                            <div class="error-message" id="confirmPassword-error">Passwords do not match</div>
-                        </div>
+                            <div class="alert alert-dark mb-4">
+                                <h5>Please review your message:</h5>
+                                <p><strong>Name:</strong> <span id="review-name"></span></p>
+                                <p><strong>Email:</strong> <span id="review-email"></span></p>
+                                <p><strong>Subject:</strong> <span id="review-subject"></span></p>
+                                <p><strong>Message:</strong> <span id="review-message"></span></p>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Subject *</label>
-                            <select class="form-select bg-dark text-white border-dark" id="subject" name="subject">
-                                <option value="">Select a subject</option>
-                                <option value="suggestion">Game Suggestion</option>
-                                <option value="question">Question</option>
-                                <option value="partnership">Partnership</option>
-                                <option value="technical">Technical Issue</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <div class="error-message" id="subject-error">Please select a subject</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="message" class="form-label">Your Message *</label>
-                            <textarea class="form-control bg-dark text-white border-dark" id="message" name="message" rows="5" placeholder="Type your message here..."></textarea>
-                            <div class="error-message" id="message-error">Message must be at least 10 characters</div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-danger btn-lg">Send Message</button>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-light prev-step">← Back</button>
+                                <button type="submit" class="btn btn-success">Send Message</button>
+                            </div>
                         </div>
                     </form>
                 </div>

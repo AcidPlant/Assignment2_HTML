@@ -33,6 +33,14 @@
                     <a class="nav-link" href="contact.html">Contact</a>
                 </li>
             </ul>
+            <!-- Language Selector -->
+            <div class="language-selector ms-3">
+                <select id="language-select" class="form-select form-select-sm bg-dark text-white border-dark">
+                    <option value="en">English</option>
+                    <option value="kk">Қазақша</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
         </div>
     </div>
 </nav>
@@ -41,7 +49,7 @@
 <section id="hero" class="hero-section vh-100 d-flex align-items-center">
     <div class="hero-overlay position-absolute w-100 h-100"></div>
     <div class="container position-relative text-center text-white">
-        <h1 class="display-3 fw-bold mb-4">SOULS-LIKE GAMES</h1>
+        <h1 class="display-3 fw-bold mb-4" data-translate="welcome">SOULS-LIKE GAMES</h1>
         <p class="lead mb-0">Discover the world of hardcore games.<br>Find any souls-like game in our extensive library</p>
     </div>
 </section>
@@ -163,7 +171,86 @@
             </div>
         </div>
     </section>
+
+    <!-- Advanced Features Section -->
+    <section class="py-5 bg-dark">
+        <div class="container">
+            <h2 class="text-center text-danger mb-5 display-4">Interactive Features</h2>
+
+            <!-- Rating System -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="p-4 bg-secondary text-white rounded shadow">
+                        <h3 class="text-danger mb-3">Rate Our Collection</h3>
+                        <div class="rating-stars mb-3">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <p id="rating-display" class="mb-0">Your rating: Not rated yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle and Interactive Features -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="p-4 bg-secondary text-white rounded shadow h-100">
+                        <h3 class="text-danger mb-3">Theme Controls</h3>
+                        <div class="btn-group w-100 mb-3">
+                            <button id="day-theme" class="btn btn-outline-warning">☀️ Day Mode</button>
+                            <button id="night-theme" class="btn btn-outline-primary">🌙 Night Mode</button>
+                        </div>
+                        <button id="theme-toggle" class="btn btn-danger w-100 mb-3">Toggle Theme</button>
+                        <button id="random-color" class="btn btn-outline-info w-100">Random Background</button>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-4 bg-secondary text-white rounded shadow h-100">
+                        <h3 class="text-danger mb-3">Interactive Features</h3>
+                        <button id="time-btn" class="btn btn-success w-100 mb-3">🕒 Show Current Time</button>
+                        <div id="time-display" class="text-center mb-3"></div>
+
+                        <button id="sound-btn" class="btn btn-warning w-100 mb-3">🔊 Play Sound</button>
+                        <button id="animate-btn" class="btn btn-info w-100">✨ Animate Cards</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Content Area -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="p-4 bg-secondary text-white rounded shadow">
+                        <h3 class="text-danger mb-3">Dynamic Content</h3>
+                        <div class="input-group mb-3">
+                            <input type="text" id="name-input" class="form-control bg-dark text-white" placeholder="Enter your name">
+                            <button id="greet-btn" class="btn btn-danger">Greet Me</button>
+                        </div>
+                        <h4 id="greeting-display" class="text-center"></h4>
+
+                        <div class="mt-4">
+                            <button id="load-content" class="btn btn-outline-light w-100">Load Random Game Fact</button>
+                            <div id="content-area" class="mt-3 p-3 bg-dark rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
+
+<!-- Audio Element for Sounds -->
+<audio id="sound-effect" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Task 4: Change Background Color Button -->
+<button id="color-change-btn" class="btn btn-danger" title="Change background color">
+    🎨
+</button>
 
 <!-- Footer -->
 <footer class="bg-dark text-white py-5 mt-5">
@@ -203,6 +290,7 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 </body>
 
 </html>
