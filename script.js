@@ -1,10 +1,3 @@
-// In-memory storage instead of localStorage
-const appState = {
-    theme: 'night',
-    language: 'en',
-    currentRating: 0
-};
-
 // Task 5: Display Current Date and Time
 function updateDateTime() {
     const now = new Date();
@@ -36,22 +29,23 @@ function updateDateTime() {
 setInterval(updateDateTime, 1000);
 updateDateTime(); // Initial call
 
+// ===== ADVANCED JAVASCRIPT FEATURES =====
+
 // ===== DOM MANIPULATION AND STYLING =====
 
 // 1. Rating System
 function initRatingSystem() {
     const stars = document.querySelectorAll('.star');
     const ratingDisplay = document.getElementById('rating-display');
+    let currentRating = 0;
 
     stars.forEach(star => {
         star.addEventListener('click', function() {
             const rating = parseInt(this.getAttribute('data-rating'));
-            appState.currentRating = rating;
+            currentRating = rating;
             updateStars(rating);
-            if (ratingDisplay) {
-                ratingDisplay.textContent = `Your rating: ${rating}/5`;
-                ratingDisplay.className = 'mb-0 text-success';
-            }
+            ratingDisplay.textContent = `Your rating: ${rating}/5`;
+            ratingDisplay.className = 'mb-0 text-success';
             playSound();
         });
 
@@ -61,7 +55,7 @@ function initRatingSystem() {
         });
 
         star.addEventListener('mouseout', function() {
-            updateStars(appState.currentRating);
+            updateStars(currentRating);
         });
     });
 
@@ -79,7 +73,6 @@ function initRatingSystem() {
         });
     }
 }
-
 // 2. Theme Management
 function initThemeSystem() {
     const dayThemeBtn = document.getElementById('day-theme');
@@ -92,23 +85,89 @@ function initThemeSystem() {
             background: '#f8f9fa',
             text: '#212529',
             card: '#ffffff',
-            accent: '#dc3545'
+            accent: '#dc3545',
+            dark: '#e9ecef',
+            secondary: '#f8f9fa',
+            border: '#dee2e6'
         },
         night: {
             background: '#0a0a0a',
             text: '#e0e0e0',
             card: '#1a1a1a',
-            accent: '#dc3545'
+            accent: '#dc3545',
+            dark: '#151515',
+            secondary: '#2a2a2a',
+            border: '#333'
         }
     };
 
     function applyTheme(theme) {
+        // Apply to body
         document.body.style.backgroundColor = theme.background;
         document.body.style.color = theme.text;
 
+        // Apply to all cards
         document.querySelectorAll('.card').forEach(card => {
             card.style.backgroundColor = theme.card;
             card.style.color = theme.text;
+            card.style.borderColor = theme.border;
+        });
+
+        // Apply to background classes
+        document.querySelectorAll('.bg-dark').forEach(el => {
+            el.style.backgroundColor = theme.dark + '!important';
+            el.style.color = theme.text;
+        });
+
+        document.querySelectorAll('.bg-secondary').forEach(el => {
+            el.style.backgroundColor = theme.secondary + '!important';
+            el.style.color = theme.text;
+        });
+
+        // Apply to alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            if (alert.classList.contains('alert-dark')) {
+                alert.style.backgroundColor = theme.dark;
+                alert.style.color = theme.text;
+                alert.style.borderColor = theme.border;
+            }
+        });
+
+        // Apply to form controls
+        document.querySelectorAll('.form-control, .form-select').forEach(control => {
+            control.style.backgroundColor = theme.dark;
+            control.style.color = theme.text;
+            control.style.borderColor = theme.border;
+        });
+
+        // Apply to progress bars
+        document.querySelectorAll('.progress').forEach(progress => {
+            progress.style.backgroundColor = theme.dark;
+        });
+
+        // Apply to pagination
+        document.querySelectorAll('.page-link').forEach(link => {
+            if (link.classList.contains('bg-dark')) {
+                link.style.backgroundColor = theme.dark;
+                link.style.color = theme.text;
+                link.style.borderColor = theme.border;
+            }
+        });
+
+        // Apply to accordion
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            item.style.backgroundColor = theme.secondary;
+            item.style.color = theme.text;
+        });
+
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.style.backgroundColor = theme.dark;
+            header.style.color = theme.text;
+        });
+
+        document.querySelectorAll('.accordion-content').forEach(content => {
+            content.style.backgroundColor = theme.dark;
+            content.style.color = theme.text;
         });
 
         // Update button states
@@ -116,28 +175,37 @@ function initThemeSystem() {
             if (theme === themes.day) {
                 dayThemeBtn.classList.add('active');
                 nightThemeBtn.classList.remove('active');
-                appState.theme = 'day';
             } else {
                 nightThemeBtn.classList.add('active');
                 dayThemeBtn.classList.remove('active');
-                appState.theme = 'night';
             }
         }
+
+        // Update CSS variables
+        document.documentElement.style.setProperty('--dark-bg', theme.background);
+        document.documentElement.style.setProperty('--darker-bg', theme.dark);
+        document.documentElement.style.setProperty('--dark-secondary', theme.secondary);
+        document.documentElement.style.setProperty('--text-light', theme.text);
+        document.documentElement.style.setProperty('--border-dark', theme.border);
     }
 
     dayThemeBtn?.addEventListener('click', () => {
         applyTheme(themes.day);
+        localStorage.setItem('theme', 'day');
         playSound();
     });
 
     nightThemeBtn?.addEventListener('click', () => {
         applyTheme(themes.night);
+        localStorage.setItem('theme', 'night');
         playSound();
     });
 
     themeToggleBtn?.addEventListener('click', () => {
-        const newTheme = appState.theme === 'night' ? 'day' : 'night';
+        const currentTheme = localStorage.getItem('theme') || 'night';
+        const newTheme = currentTheme === 'night' ? 'day' : 'night';
         applyTheme(themes[newTheme]);
+        localStorage.setItem('theme', newTheme);
         playSound();
     });
 
@@ -149,10 +217,10 @@ function initThemeSystem() {
         playSound();
     });
 
-    // Apply default theme
-    applyTheme(themes[appState.theme]);
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'night';
+    applyTheme(themes[savedTheme]);
 }
-
 // ===== EVENT HANDLING =====
 
 // 1. Button Event Listeners
@@ -169,15 +237,14 @@ function initButtonEvents() {
         const now = new Date();
         const timeString = now.toLocaleTimeString();
 
-        if (timeDisplay) {
-            timeDisplay.innerHTML = `
-                <div class="alert alert-info">
-                    <h4>🕐 Current Time</h4>
-                    <p class="mb-0 fs-4">${timeString}</p>
-                </div>
-            `;
-            animateElement(timeDisplay);
-        }
+        timeDisplay.innerHTML = `
+            <div class="alert alert-info">
+                <h4>🕒 Current Time</h4>
+                <p class="mb-0 fs-4">${timeString}</p>
+            </div>
+        `;
+
+        animateElement(timeDisplay);
         playSound();
     });
 
@@ -202,9 +269,9 @@ function initButtonEvents() {
     greetBtn?.addEventListener('click', function() {
         const nameInput = document.getElementById('name-input');
         const greetingDisplay = document.getElementById('greeting-display');
-        const name = nameInput?.value.trim();
+        const name = nameInput.value.trim();
 
-        if (name && greetingDisplay) {
+        if (name) {
             const hour = new Date().getHours();
             let greeting;
 
@@ -228,7 +295,7 @@ function initButtonEvents() {
             }, 3000);
 
             playSound();
-        } else if (greetingDisplay) {
+        } else {
             greetingDisplay.textContent = 'Please enter your name first!';
             greetingDisplay.className = 'text-center text-danger';
         }
@@ -252,17 +319,17 @@ function initKeyboardNavigation() {
             case 'ArrowRight':
                 e.preventDefault();
                 currentFocus = (currentFocus + 1) % focusableElements.length;
-                focusableElements[currentFocus]?.focus();
+                focusableElements[currentFocus].focus();
                 break;
             case 'ArrowUp':
             case 'ArrowLeft':
                 e.preventDefault();
                 currentFocus = (currentFocus - 1 + focusableElements.length) % focusableElements.length;
-                focusableElements[currentFocus]?.focus();
+                focusableElements[currentFocus].focus();
                 break;
             case 'Enter':
                 if (e.target === document.getElementById('name-input')) {
-                    document.getElementById('greet-btn')?.click();
+                    document.getElementById('greet-btn').click();
                 }
                 break;
         }
@@ -310,11 +377,11 @@ function loadRandomContent() {
     ];
 
     const contentArea = document.getElementById('content-area');
-    if (!contentArea) return;
+    const randomFact = facts[Math.floor(Math.random() * facts.length)];
 
     // Using array higher-order functions
     const formattedFacts = facts
-        .filter(fact => fact.length > 30)
+        .filter(fact => fact.length > 30) // Only facts longer than 30 chars
         .map(fact => ({
             text: fact,
             length: fact.length,
@@ -387,17 +454,18 @@ function initMultiStepForm() {
     const totalSteps = 3;
 
     function showStep(step) {
+        // Hide all steps
         document.querySelectorAll('.form-step').forEach(el => {
             el.style.display = 'none';
-            el.classList.remove('active');
         });
 
+        // Show current step
         const currentStepEl = document.getElementById(`step-${step}`);
         if (currentStepEl) {
             currentStepEl.style.display = 'block';
-            currentStepEl.classList.add('active');
         }
 
+        // Update progress
         updateProgress(step);
     }
 
@@ -417,23 +485,19 @@ function initMultiStepForm() {
                 const name = document.getElementById('name');
                 const email = document.getElementById('email');
 
-                if (name) {
-                    if (!name.value.trim() || name.value.trim().length < 2) {
-                        showError('name', 'Name is required and must be at least 2 characters');
-                        isValid = false;
-                    } else {
-                        showSuccess('name');
-                    }
+                if (!name.value.trim() || name.value.trim().length < 2) {
+                    showError('name', 'Name is required and must be at least 2 characters');
+                    isValid = false;
+                } else {
+                    showSuccess('name');
                 }
 
-                if (email) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!email.value.trim() || !emailRegex.test(email.value)) {
-                        showError('email', 'Please enter a valid email address');
-                        isValid = false;
-                    } else {
-                        showSuccess('email');
-                    }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email.value.trim() || !emailRegex.test(email.value)) {
+                    showError('email', 'Please enter a valid email address');
+                    isValid = false;
+                } else {
+                    showSuccess('email');
                 }
                 break;
 
@@ -441,22 +505,18 @@ function initMultiStepForm() {
                 const subject = document.getElementById('subject');
                 const message = document.getElementById('message');
 
-                if (subject) {
-                    if (!subject.value) {
-                        showError('subject', 'Please select a subject');
-                        isValid = false;
-                    } else {
-                        showSuccess('subject');
-                    }
+                if (!subject.value) {
+                    showError('subject', 'Please select a subject');
+                    isValid = false;
+                } else {
+                    showSuccess('subject');
                 }
 
-                if (message) {
-                    if (!message.value.trim() || message.value.trim().length < 10) {
-                        showError('message', 'Message must be at least 10 characters');
-                        isValid = false;
-                    } else {
-                        showSuccess('message');
-                    }
+                if (!message.value.trim() || message.value.trim().length < 10) {
+                    showError('message', 'Message must be at least 10 characters');
+                    isValid = false;
+                } else {
+                    showSuccess('message');
                 }
                 break;
         }
@@ -465,18 +525,10 @@ function initMultiStepForm() {
     }
 
     function updateReview() {
-        const reviewName = document.getElementById('review-name');
-        const reviewEmail = document.getElementById('review-email');
-        const reviewSubject = document.getElementById('review-subject');
-        const reviewMessage = document.getElementById('review-message');
-        const subject = document.getElementById('subject');
-
-        if (reviewName) reviewName.textContent = document.getElementById('name')?.value || '';
-        if (reviewEmail) reviewEmail.textContent = document.getElementById('email')?.value || '';
-        if (reviewSubject && subject) {
-            reviewSubject.textContent = subject.options[subject.selectedIndex]?.text || '';
-        }
-        if (reviewMessage) reviewMessage.textContent = document.getElementById('message')?.value || '';
+        document.getElementById('review-name').textContent = document.getElementById('name').value;
+        document.getElementById('review-email').textContent = document.getElementById('email').value;
+        document.getElementById('review-subject').textContent = document.getElementById('subject').options[document.getElementById('subject').selectedIndex].text;
+        document.getElementById('review-message').textContent = document.getElementById('message').value;
     }
 
     // Navigation buttons
@@ -528,17 +580,16 @@ function initGameFiltering() {
         button.addEventListener('click', function() {
             const filter = this.getAttribute('data-filter');
 
+            // Remove active class from all buttons
             filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
             this.classList.add('active');
 
+            // Filter games
             gameCards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                if (filter === 'all' || category === filter) {
+                if (filter === 'all' || card.getAttribute('data-category') === filter) {
                     card.style.display = 'block';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.8)';
                     setTimeout(() => {
-                        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                         card.style.opacity = '1';
                         card.style.transform = 'scale(1)';
                     }, 50);
@@ -563,75 +614,30 @@ function initLanguageSelector() {
 
     const translations = {
         en: {
-            // Hero section
             welcome: "SOULS-LIKE GAMES",
-            heroSubtitle: "Discover the world of hardcore games. Find any souls-like game in our extensive library",
-            
-            // Navigation
-            home: "Home",
-            library: "Library",
             about: "About",
             contact: "Contact",
-            
-            // Sections
-            whatAreSoulsLike: "What are Souls-like games?",
-            popularGames: "Popular Souls-like Games",
-            categories: "Categories of Souls-like Games",
-            
-            // Buttons
-            learnMore: "Learn More",
-            viewMore: "View More",
-            browseLibrary: "Browse Our Library"
+            library: "Library"
         },
         kk: {
-            // Hero section
             welcome: "SOULS-LIKE ОЙЫНДАРЫ",
-            heroSubtitle: "Хардкор ойындар әлеміне саяхат жасаңыз. Біздің кең кітапханадан кез келген souls-like ойынын табыңыз",
-            
-            // Navigation
-            home: "Басты бет",
-            library: "Кітапхана",
             about: "Біз туралы",
             contact: "Байланыс",
-            
-            // Sections
-            whatAreSoulsLike: "Souls-like ойындары дегеніміз не?",
-            popularGames: "Танымал Souls-like Ойындары",
-            categories: "Souls-like Ойындарының Санаттары",
-            
-            // Buttons
-            learnMore: "Толығырақ",
-            viewMore: "Көбірек көру",
-            browseLibrary: "Кітапхананы шолу"
+            library: "Кітапхана"
         },
         ru: {
-            // Hero section
             welcome: "SOULS-LIKE ИГРЫ",
-            heroSubtitle: "Откройте для себя мир хардкорных игр. Найдите любую souls-like игру в нашей обширной библиотеке",
-            
-            // Navigation
-            home: "Главная",
-            library: "Библиотека",
             about: "О нас",
             contact: "Контакты",
-            
-            // Sections
-            whatAreSoulsLike: "Что такое Souls-like игры?",
-            popularGames: "Популярные Souls-like Игры",
-            categories: "Категории Souls-like Игр",
-            
-            // Buttons
-            learnMore: "Узнать больше",
-            viewMore: "Смотреть больше",
-            browseLibrary: "Просмотр библиотеки"
+            library: "Библиотека"
         }
     };
 
-    function applyTranslation(lang) {
+    languageSelect.addEventListener('change', function() {
+        const lang = this.value;
         const translation = translations[lang];
-        if (!translation) return;
 
-        // Translate elements with data-translate attribute
+        // Update page content based on selected language
         document.querySelectorAll('[data-translate]').forEach(element => {
             const key = element.getAttribute('data-translate');
             if (translation[key]) {
@@ -639,34 +645,103 @@ function initLanguageSelector() {
             }
         });
 
-        // Translate navigation links
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href === 'index.html' && translation.home) {
-                link.textContent = translation.home;
-            } else if (href === 'library.html' && translation.library) {
-                link.textContent = translation.library;
-            } else if (href === 'about.html' && translation.about) {
-                link.textContent = translation.about;
-            } else if (href === 'contact.html' && translation.contact) {
-                link.textContent = translation.contact;
+        // Update navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            const text = link.textContent.trim();
+            if (translation[text.toLowerCase()]) {
+                link.textContent = translation[text.toLowerCase()];
             }
         });
 
-        appState.language = lang;
-    }
-
-    languageSelect.addEventListener('change', function() {
-        applyTranslation(this.value);
+        localStorage.setItem('preferred-language', lang);
         playSound();
     });
 
-    // Apply initial language
-    applyTranslation(appState.language);
+    // Load saved language preference
+    const savedLang = localStorage.getItem('preferred-language') || 'en';
+    languageSelect.value = savedLang;
+    languageSelect.dispatchEvent(new Event('change'));
 }
 
-// ===== FORM VALIDATION =====
+// ===== TASK 1: FORM VALIDATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contact-form');
+
+    if (contactForm && !contactForm.classList.contains('multi-step')) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Reset previous errors
+            resetErrors();
+
+            let isValid = true;
+
+            // Validate Name
+            const name = document.getElementById('name');
+            if (!name.value.trim() || name.value.trim().length < 2) {
+                showError('name', 'Name is required and must be at least 2 characters');
+                isValid = false;
+            } else {
+                showSuccess('name');
+            }
+
+            // Validate Email
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                showSuccess('email');
+            }
+
+            // Validate Password
+            const password = document.getElementById('password');
+            if (password && (!password.value || password.value.length < 8)) {
+                showError('password', 'Password must be at least 8 characters');
+                isValid = false;
+            } else if (password) {
+                showSuccess('password');
+            }
+
+            // Validate Password Confirmation
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword && (!confirmPassword.value || confirmPassword.value !== password.value)) {
+                showError('confirmPassword', 'Passwords do not match');
+                isValid = false;
+            } else if (confirmPassword) {
+                showSuccess('confirmPassword');
+            }
+
+            // Validate Subject
+            const subject = document.getElementById('subject');
+            if (subject && !subject.value) {
+                showError('subject', 'Please select a subject');
+                isValid = false;
+            } else if (subject) {
+                showSuccess('subject');
+            }
+
+            // Validate Message
+            const message = document.getElementById('message');
+            if (message && (!message.value.trim() || message.value.trim().length < 10)) {
+                showError('message', 'Message must be at least 10 characters');
+                isValid = false;
+            } else if (message) {
+                showSuccess('message');
+            }
+
+            // If form is valid, show success message
+            if (isValid) {
+                alert('Form submitted successfully! Thank you for contacting us.');
+                contactForm.reset();
+                resetErrors();
+                playSound();
+            }
+        });
+    }
+});
+
 function showError(fieldId, errorMessage) {
     const field = document.getElementById(fieldId);
     const errorElement = document.getElementById(fieldId + '-error');
@@ -709,7 +784,7 @@ function resetErrors() {
     });
 }
 
-// ===== POPUP SUBSCRIPTION FORM =====
+// ===== TASK 3: POPUP SUBSCRIPTION FORM =====
 const subscribeBtn = document.getElementById('subscribe-btn');
 const popupOverlay = document.getElementById('popup-overlay');
 const popupForm = document.getElementById('popup-form');
@@ -740,8 +815,8 @@ if (subscriptionForm) {
     subscriptionForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const subName = document.getElementById('sub-name')?.value;
-        const subEmail = document.getElementById('sub-email')?.value;
+        const subName = document.getElementById('sub-name').value;
+        const subEmail = document.getElementById('sub-email').value;
 
         if (subName && subEmail) {
             alert(`Thank you for subscribing, ${subName}! We'll send updates to ${subEmail}.`);
@@ -764,17 +839,17 @@ function hidePopup() {
     if (popupForm) popupForm.classList.remove('show');
 }
 
-// ===== CHANGE BACKGROUND COLOR =====
+// ===== TASK 4: CHANGE BACKGROUND COLOR =====
 const colorChangeBtn = document.getElementById('color-change-btn');
 const colors = [
-    '#0a0a0a',
-    '#1a0f1f',
-    '#0f1a1a',
-    '#1a1a0f',
-    '#1f0f0f',
-    '#0f0f1f',
-    '#1a0a14',
-    '#141a0a'
+    '#0a0a0a', // Original dark
+    '#1a0f1f', // Dark purple
+    '#0f1a1a', // Dark teal
+    '#1a1a0f', // Dark olive
+    '#1f0f0f', // Dark red
+    '#0f0f1f', // Dark blue
+    '#1a0a14', // Dark brown
+    '#141a0a', // Dark green',
 ];
 
 let currentColorIndex = 0;
@@ -785,6 +860,7 @@ if (colorChangeBtn) {
         document.body.style.transition = 'background-color 0.5s ease';
         document.body.style.backgroundColor = colors[currentColorIndex];
 
+        // Add rotation animation to button
         this.style.transform = 'scale(1.1) rotate(360deg)';
         setTimeout(() => {
             this.style.transform = '';
@@ -794,7 +870,7 @@ if (colorChangeBtn) {
     });
 }
 
-// ===== ACCORDION FOR FAQS =====
+// ===== TASK 2: ACCORDION FOR FAQS =====
 function initAccordion() {
     const accordionItems = document.querySelectorAll('.accordion-item');
 
@@ -806,6 +882,7 @@ function initAccordion() {
             header.addEventListener('click', function() {
                 const isActive = item.classList.contains('active');
 
+                // Close all accordion items
                 accordionItems.forEach(otherItem => {
                     otherItem.classList.remove('active');
                     const otherContent = otherItem.querySelector('.accordion-content');
@@ -815,6 +892,7 @@ function initAccordion() {
                     }
                 });
 
+                // Toggle current item
                 if (!isActive) {
                     item.classList.add('active');
                     content.style.maxHeight = content.scrollHeight + 'px';
@@ -828,6 +906,7 @@ function initAccordion() {
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all systems
     initRatingSystem();
     initThemeSystem();
     initButtonEvents();
@@ -837,13 +916,17 @@ document.addEventListener('DOMContentLoaded', function() {
     initLanguageSelector();
     initAccordion();
 
+    // Display game manager data
     gameManager.displayGames();
-    enhanceExistingCards();
 
     console.log('🚀 Advanced JavaScript features loaded successfully!');
+
+    // Add some interactive elements to existing cards
+    enhanceExistingCards();
 });
 
 function enhanceExistingCards() {
+    // Add hover effects to all cards
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-10px) scale(1.02)';
@@ -856,6 +939,7 @@ function enhanceExistingCards() {
     });
 }
 
+// Utility function for smooth scrolling
 function smoothScrollTo(elementId) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -866,6 +950,7 @@ function smoothScrollTo(elementId) {
     }
 }
 
+// Export functions for global access (if needed)
 window.soulsLikeApp = {
     smoothScrollTo,
     playSound,
