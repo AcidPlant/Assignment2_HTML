@@ -132,6 +132,15 @@ function initThemeSystem() {
                 alert.style.borderColor = theme.border;
             }
         });
+// Apply to navbar
+        document.querySelectorAll('.navbar').forEach(navbar => {
+            navbar.style.backgroundColor = theme.card;
+            navbar.style.color = theme.text;
+        });
+
+        document.querySelectorAll('.navbar a, .navbar-brand, .nav-link').forEach(link => {
+            link.style.color = theme.text;
+        });
 
         // Apply to form controls
         document.querySelectorAll('.form-control, .form-select').forEach(control => {
@@ -615,18 +624,21 @@ function initLanguageSelector() {
     const translations = {
         en: {
             welcome: "SOULS-LIKE GAMES",
+            home: "Home",
             about: "About",
             contact: "Contact",
             library: "Library"
         },
         kk: {
             welcome: "SOULS-LIKE ОЙЫНДАРЫ",
+            home: "Басты Бет",
             about: "Біз туралы",
             contact: "Байланыс",
             library: "Кітапхана"
         },
         ru: {
             welcome: "SOULS-LIKE ИГРЫ",
+            home: "Главная",
             about: "О нас",
             contact: "Контакты",
             library: "Библиотека"
