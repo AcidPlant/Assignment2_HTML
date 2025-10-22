@@ -1,84 +1,665 @@
-// Task 5: Display Current Date and Time
-function updateDateTime() {
-    const now = new Date();
-    const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-    };
+// ===== JQUERY SETUP =====
+$(document).ready(function() {
+    console.log("jQuery is ready!");
+    
+    // Initialize all systems
+    initDateTime();
+    initWelcomeAlert();
+    initRatingSystem();
+    initThemeSystem();
+    initButtonEvents();
+    initKeyboardNavigation();
+    initMultiStepForm();
+    initGameFiltering();
+    initLanguageSelector();
+    initAccordion();
+    initCardRatings();
+    startFactRotation();
+    enhanceExistingCards();
+    
+    // jQuery Assignment 7 Tasks
+    initRealtimeSearch();
+    initAutocompleteSearch();
+    initSearchHighlighting();
+    initScrollProgressBar();
+    initAnimatedCounter();
+    initLoadingSpinner();
+    initNotificationSystem();
+    initCopyToClipboard();
+    initLazyLoading();
+    
+    gameManager.displayGames();
+    console.log('🚀 Advanced JavaScript and jQuery features loaded successfully!');
+});
 
-    const formattedDate = now.toLocaleDateString('en-US', options);
-    const datetimeDisplay = document.getElementById('datetime-display');
+// ===== TASK 0: JQUERY SETUP =====
+// Already done with $(document).ready() above
 
-    if (datetimeDisplay) {
-        datetimeDisplay.innerHTML = `
-            <div class="alert alert-dark text-center">
-                <div class="fw-bold text-danger">📅 Current Date & Time</div>
-                <div class="mt-2">${formattedDate}</div>
-            </div>
-        `;
-    }
-}
+// ===== PART 1: JQUERY SEARCH =====
 
-// Update datetime every second
-setInterval(updateDateTime, 1000);
-updateDateTime(); // Initial call
-
-// ===== ADVANCED JAVASCRIPT FEATURES =====
-
-// ===== DOM MANIPULATION AND STYLING =====
-
-// 1. Rating System
-function initRatingSystem() {
-    const stars = document.querySelectorAll('.star');
-    const ratingDisplay = document.getElementById('rating-display');
-    let currentRating = 0;
-
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            currentRating = rating;
-            updateStars(rating);
-            ratingDisplay.textContent = `Your rating: ${rating}/5`;
-            ratingDisplay.className = 'mb-0 text-success';
-            playSound();
-        });
-
-        star.addEventListener('mouseover', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            updateStars(rating, true);
-        });
-
-        star.addEventListener('mouseout', function() {
-            updateStars(currentRating);
-        });
-    });
-
-    function updateStars(rating, isHover = false) {
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.style.color = '#ffd700';
-                star.style.textShadow = '0 0 10px gold';
-                star.style.transform = 'scale(1.2)';
+// Task 1: Real-time Search and Live Filter
+function initRealtimeSearch() {
+    const searchInput = $('#searchInput');
+    const gameCards = $('.game-card');
+    
+    if (searchInput.length && gameCards.length) {
+        searchInput.on('keyup', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            
+            gameCards.each(function() {
+                const cardText = $(this).text().toLowerCase();
+                
+                if (cardText.includes(searchTerm)) {
+                    $(this).fadeIn(300).css({
+                        'opacity': '1',
+                        'transform': 'scale(1)'
+                    });
+                } else {
+                    $(this).fadeOut(300);
+                }
+            });
+            
+            // Show "no results" message if needed
+            if (gameCards.filter(':visible').length === 0) {
+                if ($('#no-results').length === 0) {
+                    $('.row.g-4').after('<div id="no-results" class="text-center text-muted py-5"><h3>No games found matching your search</h3></div>');
+                }
             } else {
-                star.style.color = isHover ? '#ffd70066' : '#666';
-                star.style.textShadow = 'none';
-                star.style.transform = 'scale(1)';
+                $('#no-results').remove();
             }
         });
     }
 }
-// 2. Theme Management
+
+// Task 2: Autocomplete Search Suggestions
+function initAutocompleteSearch() {
+    const searchInput = $('#searchInput');
+    
+    if (searchInput.length) {
+        const games = [
+            'Dark Souls III',
+            'Hollow Knight',
+            'Code Vein',
+            'Blasphemous',
+            'Sekiro: Shadows Die Twice',
+            'Elden Ring',
+            'Salt and Sanctuary',
+            'Nioh 2',
+            'Dark Souls Remastered',
+            'Bloodborne',
+            'Mortal Shell',
+            'Lies of P'
+        ];
+        
+        // Create autocomplete container
+        if ($('#autocomplete-list').length === 0) {
+            searchInput.after('<div id="autocomplete-list" class="autocomplete-list"></div>');
+        }
+        
+        searchInput.on('input', function() {
+            const value = $(this).val().toLowerCase();
+            const autocompleteList = $('#autocomplete-list');
+            
+            autocompleteList.empty();
+            
+            if (value.length > 0) {
+                const matches = games.filter(game => 
+                    game.toLowerCase().includes(value)
+                );
+                
+                if (matches.length > 0) {
+                    matches.slice(0, 5).forEach(match => {
+                        const item = $('<div class="autocomplete-item"></div>')
+                            .text(match)
+                            .on('click', function() {
+                                searchInput.val(match).trigger('keyup');
+                                autocompleteList.empty().hide();
+                            });
+                        autocompleteList.append(item);
+                    });
+                    autocompleteList.show();
+                } else {
+                    autocompleteList.hide();
+                }
+            } else {
+                autocompleteList.hide();
+            }
+        });
+        
+        // Close autocomplete when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#searchInput, #autocomplete-list').length) {
+                $('#autocomplete-list').hide();
+            }
+        });
+    }
+}
+
+// Task 3: Search Highlighting
+function initSearchHighlighting() {
+    // Add search input for FAQ section
+    const faqSection = $('#faq');
+    
+    if (faqSection.length && $('#faq-search').length === 0) {
+        faqSection.before(`
+            <div class="mb-4">
+                <div class="input-group">
+                    <input type="text" id="faq-search" class="form-control bg-dark text-white border-dark" 
+                           placeholder="Search in FAQs...">
+                    <button id="clear-highlight" class="btn btn-outline-danger">Clear</button>
+                </div>
+            </div>
+        `);
+    }
+    
+    $('#faq-search').on('keyup', function() {
+        const searchTerm = $(this).val();
+        
+        // Remove previous highlights
+        $('.accordion-content').each(function() {
+            const content = $(this).html();
+            const cleanContent = content.replace(/<mark class="highlight">(.*?)<\/mark>/g, '$1');
+            $(this).html(cleanContent);
+        });
+        
+        if (searchTerm.length > 2) {
+            $('.accordion-content').each(function() {
+                const content = $(this).html();
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                const highlightedContent = content.replace(regex, '<mark class="highlight">$1</mark>');
+                $(this).html(highlightedContent);
+            });
+        }
+    });
+    
+    $('#clear-highlight').on('click', function() {
+        $('#faq-search').val('');
+        $('.accordion-content').each(function() {
+            const content = $(this).html();
+            const cleanContent = content.replace(/<mark class="highlight">(.*?)<\/mark>/g, '$1');
+            $(this).html(cleanContent);
+        });
+    });
+}
+
+// ===== PART 2: UX ENGAGEMENT ELEMENTS =====
+
+// Task 4: Colorful and Stylized Scroll Progress Bar
+function initScrollProgressBar() {
+    // Add progress bar to page
+    if ($('#scroll-progress').length === 0) {
+        $('body').prepend(`
+            <div id="scroll-progress-container">
+                <div id="scroll-progress"></div>
+            </div>
+        `);
+    }
+    
+    $(window).on('scroll', function() {
+        const windowHeight = $(window).height();
+        const documentHeight = $(document).height();
+        const scrollTop = $(window).scrollTop();
+        
+        const progress = (scrollTop / (documentHeight - windowHeight)) * 100;
+        
+        $('#scroll-progress').css('width', progress + '%');
+    });
+}
+
+// Task 5: Animated Number Counter
+function initAnimatedCounter() {
+    const counters = $('.stats-counter');
+    
+    if (counters.length === 0) {
+        // Add stats section if not exists
+        const statsSection = `
+            <section class="stats-section py-5 bg-dark">
+                <div class="container">
+                    <div class="row g-4 text-center">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="12">0</h2>
+                                <p class="text-muted">Games in Library</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="50">0</h2>
+                                <p class="text-muted">Boss Guides</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="1000">0</h2>
+                                <p class="text-muted">Community Members</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+        
+        $('.main-content').append(statsSection);
+    }
+    
+    let animated = false;
+    
+    $(window).on('scroll', function() {
+        const counters = $('.stats-counter');
+        
+        if (counters.length > 0 && !animated) {
+            const statsSection = counters.closest('.stats-section');
+            const sectionTop = statsSection.offset().top;
+            const windowBottom = $(window).scrollTop() + $(window).height();
+            
+            if (windowBottom > sectionTop) {
+                animated = true;
+                
+                counters.each(function() {
+                    const $this = $(this);
+                    const target = parseInt($this.data('target'));
+                    
+                    $({ counter: 0 }).animate({ counter: target }, {
+                        duration: 2000,
+                        easing: 'swing',
+                        step: function() {
+                            $this.text(Math.floor(this.counter) + '+');
+                        },
+                        complete: function() {
+                            $this.text(target + '+');
+                        }
+                    });
+                });
+            }
+        }
+    });
+}
+
+// Task 6: Loading Spinner on Submit
+function initLoadingSpinner() {
+    $('form').on('submit', function(e) {
+        const submitBtn = $(this).find('button[type="submit"]');
+        
+        if (submitBtn.length) {
+            const originalText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true)
+                .html('<span class="spinner-border spinner-border-sm me-2"></span>Please wait...');
+            
+            // Simulate server call
+            setTimeout(function() {
+                submitBtn.prop('disabled', false).html(originalText);
+                showNotification('Form submitted successfully!', 'success');
+            }, 2000);
+        }
+    });
+}
+
+// ===== PART 3: IMPROVE WEB APP FUNCTIONALITY =====
+
+// Task 7: Notification System
+function initNotificationSystem() {
+    // Add notification container
+    if ($('#notification-container').length === 0) {
+        $('body').append('<div id="notification-container"></div>');
+    }
+}
+
+function showNotification(message, type = 'success') {
+    const notification = $(`
+        <div class="notification notification-${type}">
+            <span class="notification-icon">
+                ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+            </span>
+            <span class="notification-message">${message}</span>
+        </div>
+    `);
+    
+    $('#notification-container').append(notification);
+    
+    setTimeout(() => notification.addClass('show'), 100);
+    
+    setTimeout(() => {
+        notification.removeClass('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Task 8: Copy to Clipboard Button
+function initCopyToClipboard() {
+    // Add copy buttons to code snippets or specific text
+    $('.card-text').each(function(index) {
+        if ($(this).text().length > 50) {
+            const copyBtn = $(`
+                <button class="btn btn-sm btn-outline-light mt-2 copy-btn" data-index="${index}">
+                    <span class="copy-icon">📋</span> Copy
+                </button>
+            `);
+            
+            $(this).after(copyBtn);
+        }
+    });
+    
+    $('.copy-btn').on('click', function() {
+        const $btn = $(this);
+        const index = $btn.data('index');
+        const text = $btn.prev('.card-text').text();
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(text).then(() => {
+            $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
+            
+            showNotification('Copied to clipboard!', 'success');
+            
+            setTimeout(() => {
+                $btn.html('<span class="copy-icon">📋</span> Copy').removeClass('btn-success');
+            }, 2000);
+        }).catch(err => {
+            showNotification('Failed to copy', 'error');
+        });
+    });
+}
+
+// Task 9: Image Lazy Loading
+function initLazyLoading() {
+    $('img').each(function() {
+        const $img = $(this);
+        const src = $img.attr('src');
+        
+        // Store original src and replace with placeholder
+        if (src && !$img.hasClass('lazy-loaded')) {
+            $img.attr('data-src', src)
+                .attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
+                .addClass('lazy-load');
+        }
+    });
+    
+    function lazyLoad() {
+        $('.lazy-load').each(function() {
+            const $img = $(this);
+            const imgTop = $img.offset().top;
+            const imgBottom = imgTop + $img.height();
+            const windowTop = $(window).scrollTop();
+            const windowBottom = windowTop + $(window).height();
+            
+            if (imgBottom > windowTop && imgTop < windowBottom + 200) {
+                const src = $img.attr('data-src');
+                if (src) {
+                    $img.attr('src', src)
+                        .removeClass('lazy-load')
+                        .addClass('lazy-loaded')
+                        .on('load', function() {
+                            $(this).addClass('loaded');
+                        });
+                }
+            }
+        });
+    }
+    
+    $(window).on('scroll resize', lazyLoad);
+    lazyLoad(); // Initial load
+}
+
+// ===== EXISTING FUNCTIONS (Modified for jQuery) =====
+
+// Modified Welcome Alert - Show only once with name input
+function initWelcomeAlert() {
+    // Check if user has already seen the welcome message
+    if (localStorage.getItem('welcomeShown')) {
+        return;
+    }
+    
+    const hour = new Date().getHours();
+    let greeting;
+    
+    if (hour < 12) {
+        greeting = "Good morning, Hollow! ☀️";
+    } else if (hour < 18) {
+        greeting = "Good afternoon, Ashen One! ⚔️";
+    } else {
+        greeting = "Good evening, Hunter! 🌙";
+    }
+    
+    const alertDiv = $(`
+        <div class="custom-welcome-alert">
+            <div class="welcome-alert-content">
+                <span class="welcome-close">&times;</span>
+                <h3 class="text-danger mb-3">🎮 Welcome to Souls-like Games</h3>
+                <p class="mb-3">${greeting}</p>
+                <p class="mb-3">Ready to conquer some bosses?</p>
+                <div class="input-group mb-3">
+                    <input type="text" id="welcome-name-input" class="form-control bg-dark text-white" placeholder="Enter your name">
+                    <button id="welcome-submit" class="btn btn-danger">Continue</button>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    $('body').append(alertDiv);
+    
+    setTimeout(() => alertDiv.addClass('show'), 500);
+    
+    function closeWelcome(userName) {
+        alertDiv.removeClass('show');
+        setTimeout(() => alertDiv.remove(), 300);
+        localStorage.setItem('welcomeShown', 'true');
+        if (userName) {
+            localStorage.setItem('userName', userName);
+            showNotification(`Welcome, ${userName}! Happy gaming!`, 'success');
+        }
+    }
+    
+    $('#welcome-submit').on('click', function() {
+        const name = $('#welcome-name-input').val().trim();
+        if (name) {
+            closeWelcome(name);
+        } else {
+            showNotification('Please enter your name', 'error');
+        }
+    });
+    
+    $('#welcome-name-input').on('keypress', function(e) {
+        if (e.which === 13) {
+            $('#welcome-submit').click();
+        }
+    });
+    
+    $('.welcome-close').on('click', () => closeWelcome());
+}
+
+// Update DateTime function with jQuery
+function initDateTime() {
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+
+        const formattedDate = now.toLocaleDateString('en-US', options);
+        
+        $('#datetime-display').html(`
+            <div class="alert alert-dark text-center">
+                <div class="fw-bold text-danger">📅 Current Date & Time</div>
+                <div class="mt-2">${formattedDate}</div>
+            </div>
+        `);
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+}
+
+// ===== KEEP EXISTING FUNCTIONS =====
+
+const soulsFacts = [
+    "Dark Souls was inspired by the manga Berserk and classical European architecture.",
+    "Hollow Knight was developed by just 3 people at Team Cherry.",
+    "Elden Ring sold over 20 million copies in its first year.",
+    "Sekiro: Shadows Die Twice won Game of the Year in 2019.",
+    "The term 'Souls-like' was coined by the gaming community to describe games with similar mechanics to Dark Souls.",
+    "Bloodborne's combat system encourages aggressive play with its rally mechanic.",
+    "The average player dies over 100 times in their first Dark Souls playthrough.",
+    "Nioh combines Souls-like combat with Diablo-style loot systems.",
+    "FromSoftware's president, Hidetaka Miyazaki, directed Demon's Souls, which started the genre.",
+    "Dark Souls 3 references all previous FromSoftware titles in subtle ways.",
+    "The bonfire mechanic was inspired by camping in fantasy novels.",
+    "Praise the Sun! is one of the most iconic gestures in gaming history."
+];
+
+let currentFactIndex = 0;
+let factInterval;
+
+function displayRandomFact() {
+    const factContainer = $('#random-fact-container');
+    if (factContainer.length === 0) return;
+    
+    const fact = soulsFacts[currentFactIndex];
+    
+    factContainer.html(`
+        <div class="fact-content" onclick="changeFactManually()">
+            <div class="fact-icon">💡</div>
+            <p class="fact-text mb-0">${fact}</p>
+            <small class="fact-hint">Click to change • Auto-updates every 20s</small>
+        </div>
+    `);
+    
+    factContainer.find('.fact-content').css({
+        'opacity': '0',
+        'transform': 'translateY(20px)'
+    }).animate({
+        opacity: 1
+    }, 500).css('transform', 'translateY(0)');
+}
+
+function changeFactManually() {
+    currentFactIndex = (currentFactIndex + 1) % soulsFacts.length;
+    displayRandomFact();
+    playSound();
+}
+
+function startFactRotation() {
+    displayRandomFact();
+    factInterval = setInterval(() => {
+        currentFactIndex = (currentFactIndex + 1) % soulsFacts.length;
+        displayRandomFact();
+    }, 20000);
+}
+
+function initCardRatings() {
+    $('.game-card').each(function(cardIndex) {
+        const cardBody = $(this).find('.card-body');
+        if (cardBody.length === 0) return;
+        
+        const ratingContainer = $(`
+            <div class="card-rating-system mt-3 mb-3">
+                <div class="rating-label text-center mb-2">
+                    <small class="text-muted">Rate this game:</small>
+                </div>
+                <div class="rating-stars-small text-center" data-card="${cardIndex}">
+                    <span class="star-small" data-rating="1">★</span>
+                    <span class="star-small" data-rating="2">★</span>
+                    <span class="star-small" data-rating="3">★</span>
+                    <span class="star-small" data-rating="4">★</span>
+                    <span class="star-small" data-rating="5">★</span>
+                </div>
+                <div class="rating-display-small text-center mt-2">
+                    <small class="text-muted" id="rating-${cardIndex}">Not rated</small>
+                </div>
+            </div>
+        `);
+        
+        const buttonGroup = cardBody.find('.btn-group');
+        if (buttonGroup.length) {
+            buttonGroup.parent().prepend(ratingContainer);
+        } else {
+            cardBody.append(ratingContainer);
+        }
+        
+        let currentRating = 0;
+        
+        ratingContainer.find('.star-small').on('click', function() {
+            const rating = parseInt($(this).data('rating'));
+            currentRating = rating;
+            updateCardStars(ratingContainer.find('.star-small'), rating);
+            $(`#rating-${cardIndex}`).text(`${rating}/5 ⭐`)
+                .removeClass('text-muted').addClass('text-warning');
+            playSound();
+        }).on('mouseover', function() {
+            const rating = parseInt($(this).data('rating'));
+            updateCardStars(ratingContainer.find('.star-small'), rating, true);
+        }).on('mouseout', function() {
+            updateCardStars(ratingContainer.find('.star-small'), currentRating);
+        });
+    });
+}
+
+function updateCardStars(stars, rating, isHover = false) {
+    stars.each(function(index) {
+        if (index < rating) {
+            $(this).css({
+                'color': '#ffd700',
+                'text-shadow': '0 0 8px gold',
+                'transform': 'scale(1.1)'
+            });
+        } else {
+            $(this).css({
+                'color': isHover ? '#ffd70066' : '#666',
+                'text-shadow': 'none',
+                'transform': 'scale(1)'
+            });
+        }
+    });
+}
+
+function initRatingSystem() {
+    const stars = $('.star');
+    const ratingDisplay = $('#rating-display');
+    let currentRating = 0;
+
+    stars.on('click', function() {
+        const rating = parseInt($(this).data('rating'));
+        currentRating = rating;
+        updateStars(rating);
+        ratingDisplay.text(`Your rating: ${rating}/5`).attr('class', 'mb-0 text-success');
+        playSound();
+    }).on('mouseover', function() {
+        const rating = parseInt($(this).data('rating'));
+        updateStars(rating, true);
+    }).on('mouseout', function() {
+        updateStars(currentRating);
+    });
+
+    function updateStars(rating, isHover = false) {
+        stars.each(function(index) {
+            if (index < rating) {
+                $(this).css({
+                    'color': '#ffd700',
+                    'text-shadow': '0 0 10px gold',
+                    'transform': 'scale(1.2)'
+                });
+            } else {
+                $(this).css({
+                    'color': isHover ? '#ffd70066' : '#666',
+                    'text-shadow': 'none',
+                    'transform': 'scale(1)'
+                });
+            }
+        });
+    }
+}
+
 function initThemeSystem() {
-    const dayThemeBtn = document.getElementById('day-theme');
-    const nightThemeBtn = document.getElementById('night-theme');
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const randomColorBtn = document.getElementById('random-color');
+    const dayThemeBtn = $('#day-theme');
+    const nightThemeBtn = $('#night-theme');
+    const themeToggleBtn = $('#theme-toggle');
+    const randomColorBtn = $('#random-color');
 
     const themes = {
         day: {
@@ -102,92 +683,165 @@ function initThemeSystem() {
     };
 
     function applyTheme(theme) {
-        // Apply to body
-        document.body.style.backgroundColor = theme.background;
-        document.body.style.color = theme.text;
-
-        // Apply to all cards
-        document.querySelectorAll('.card').forEach(card => {
-            card.style.backgroundColor = theme.card;
-            card.style.color = theme.text;
-            card.style.borderColor = theme.border;
+        $('body').css({
+            'backgroundColor': theme.background,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
-        // Apply to background classes
-        document.querySelectorAll('.bg-dark').forEach(el => {
-            el.style.backgroundColor = theme.dark + '!important';
-            el.style.color = theme.text;
+        // Cards
+        $('.card').css({
+            'backgroundColor': theme.card,
+            'color': theme.text,
+            'borderColor': theme.border,
+            'transition': 'all 0.5s ease'
         });
 
-        document.querySelectorAll('.bg-secondary').forEach(el => {
-            el.style.backgroundColor = theme.secondary + '!important';
-            el.style.color = theme.text;
+        // Background dark elements
+        $('.bg-dark').css({
+            'backgroundColor': theme.dark,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
-        // Apply to alerts
-        document.querySelectorAll('.alert').forEach(alert => {
-            if (alert.classList.contains('alert-dark')) {
-                alert.style.backgroundColor = theme.dark;
-                alert.style.color = theme.text;
-                alert.style.borderColor = theme.border;
+        // Background secondary elements
+        $('.bg-secondary').css({
+            'backgroundColor': theme.secondary,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        // Accordion items
+        $('.accordion-item').css({
+            'backgroundColor': theme.secondary,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        $('.accordion-header').css({
+            'backgroundColor': theme.dark,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        $('.accordion-content').css({
+            'backgroundColor': theme.card,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        // Alerts and info boxes
+        $('.alert').each(function() {
+            if ($(this).hasClass('alert-dark')) {
+                $(this).css({
+                    'backgroundColor': theme.dark,
+                    'color': theme.text,
+                    'borderColor': theme.border,
+                    'transition': 'all 0.5s ease'
+                });
             }
         });
-// Apply to navbar
-        document.querySelectorAll('.navbar').forEach(navbar => {
-            navbar.style.backgroundColor = theme.card;
-            navbar.style.color = theme.text;
+
+        // Navbar
+        $('.navbar, .navbar-dark').css({
+            'backgroundColor': theme.card,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
-        document.querySelectorAll('.navbar a, .navbar-brand, .nav-link').forEach(link => {
-            link.style.color = theme.text;
+        $('.navbar a, .navbar-brand, .nav-link').css({
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
-        // Apply to form controls
-        document.querySelectorAll('.form-control, .form-select').forEach(control => {
-            control.style.backgroundColor = theme.dark;
-            control.style.color = theme.text;
-            control.style.borderColor = theme.border;
+        // Footer
+        $('footer').css({
+            'backgroundColor': theme.dark,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
-        // Apply to progress bars
-        document.querySelectorAll('.progress').forEach(progress => {
-            progress.style.backgroundColor = theme.dark;
+        // Form controls
+        $('.form-control, .form-select').css({
+            'backgroundColor': theme.dark,
+            'color': theme.text,
+            'borderColor': theme.border,
+            'transition': 'all 0.5s ease'
         });
 
-        // Apply to pagination
-        document.querySelectorAll('.page-link').forEach(link => {
-            if (link.classList.contains('bg-dark')) {
-                link.style.backgroundColor = theme.dark;
-                link.style.color = theme.text;
-                link.style.borderColor = theme.border;
+        // Progress bars
+        $('.progress').css({
+            'backgroundColor': theme.dark,
+            'transition': 'all 0.5s ease'
+        });
+
+        // Pagination
+        $('.page-link').each(function() {
+            if ($(this).hasClass('bg-dark')) {
+                $(this).css({
+                    'backgroundColor': theme.dark,
+                    'color': theme.text,
+                    'borderColor': theme.border,
+                    'transition': 'all 0.5s ease'
+                });
             }
         });
 
-        // Apply to accordion
-        document.querySelectorAll('.accordion-item').forEach(item => {
-            item.style.backgroundColor = theme.secondary;
-            item.style.color = theme.text;
+        // Grid sections
+        $('.p-4.bg-dark, .p-4.bg-secondary').each(function() {
+            const bgClass = $(this).hasClass('bg-dark') ? theme.dark : theme.secondary;
+            $(this).css({
+                'backgroundColor': bgClass,
+                'color': theme.text,
+                'transition': 'all 0.5s ease'
+            });
         });
 
-        document.querySelectorAll('.accordion-header').forEach(header => {
-            header.style.backgroundColor = theme.dark;
-            header.style.color = theme.text;
+        // Carousel captions
+        $('.carousel-caption').css({
+            'backgroundColor': 'rgba(0, 0, 0, 0.7)',
+            'transition': 'all 0.5s ease'
         });
 
-        document.querySelectorAll('.accordion-content').forEach(content => {
-            content.style.backgroundColor = theme.dark;
-            content.style.color = theme.text;
+        // Special sections
+        $('.stats-section, .random-facts-section').css({
+            'backgroundColor': theme.dark,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        // Text colors
+        $('.text-white').css({
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        $('.text-muted').css({
+            'color': theme.text === '#212529' ? '#6c757d' : '#b0b0b0',
+            'transition': 'all 0.5s ease'
+        });
+
+        // Fact container
+        $('.fact-content').css({
+            'backgroundColor': theme.secondary,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
+        });
+
+        // Popup forms
+        $('.popup-form, .welcome-alert-content').css({
+            'backgroundColor': theme.secondary,
+            'color': theme.text,
+            'transition': 'all 0.5s ease'
         });
 
         // Update button states
-        if (dayThemeBtn && nightThemeBtn) {
-            if (theme === themes.day) {
-                dayThemeBtn.classList.add('active');
-                nightThemeBtn.classList.remove('active');
-            } else {
-                nightThemeBtn.classList.add('active');
-                dayThemeBtn.classList.remove('active');
-            }
+        if (theme === themes.day) {
+            dayThemeBtn.addClass('active');
+            nightThemeBtn.removeClass('active');
+        } else {
+            nightThemeBtn.addClass('active');
+            dayThemeBtn.removeClass('active');
         }
 
         // Update CSS variables
@@ -196,95 +850,80 @@ function initThemeSystem() {
         document.documentElement.style.setProperty('--dark-secondary', theme.secondary);
         document.documentElement.style.setProperty('--text-light', theme.text);
         document.documentElement.style.setProperty('--border-dark', theme.border);
+
+        localStorage.setItem('theme', theme === themes.day ? 'day' : 'night');
     }
 
-    dayThemeBtn?.addEventListener('click', () => {
+    dayThemeBtn.on('click', () => {
         applyTheme(themes.day);
-        localStorage.setItem('theme', 'day');
         playSound();
     });
 
-    nightThemeBtn?.addEventListener('click', () => {
+    nightThemeBtn.on('click', () => {
         applyTheme(themes.night);
-        localStorage.setItem('theme', 'night');
         playSound();
     });
 
-    themeToggleBtn?.addEventListener('click', () => {
+    themeToggleBtn.on('click', () => {
         const currentTheme = localStorage.getItem('theme') || 'night';
         const newTheme = currentTheme === 'night' ? 'day' : 'night';
         applyTheme(themes[newTheme]);
-        localStorage.setItem('theme', newTheme);
         playSound();
     });
 
-    randomColorBtn?.addEventListener('click', () => {
+    randomColorBtn.on('click', () => {
         const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f'];
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        document.body.style.backgroundColor = randomColor;
-        document.body.style.transition = 'background-color 0.5s ease';
+        $('body').css({
+            'backgroundColor': randomColor,
+            'transition': 'background-color 0.5s ease'
+        });
         playSound();
     });
 
-    // Load saved theme
     const savedTheme = localStorage.getItem('theme') || 'night';
     applyTheme(themes[savedTheme]);
 }
-// ===== EVENT HANDLING =====
 
-// 1. Button Event Listeners
 function initButtonEvents() {
-    const timeBtn = document.getElementById('time-btn');
-    const soundBtn = document.getElementById('sound-btn');
-    const animateBtn = document.getElementById('animate-btn');
-    const greetBtn = document.getElementById('greet-btn');
-    const loadContentBtn = document.getElementById('load-content');
-
-    // Current Time Display
-    timeBtn?.addEventListener('click', function() {
-        const timeDisplay = document.getElementById('time-display');
+    $('#time-btn').on('click', function() {
+        const timeDisplay = $('#time-display');
         const now = new Date();
         const timeString = now.toLocaleTimeString();
 
-        timeDisplay.innerHTML = `
+        timeDisplay.html(`
             <div class="alert alert-info">
                 <h4>🕒 Current Time</h4>
                 <p class="mb-0 fs-4">${timeString}</p>
             </div>
-        `;
+        `);
 
         animateElement(timeDisplay);
         playSound();
     });
 
-    // Sound Effect
-    soundBtn?.addEventListener('click', function() {
+    $('#sound-btn').on('click', function() {
         playSound();
-        this.textContent = '🔊 Playing...';
-        this.classList.add('btn-success');
+        $(this).text('🔊 Playing...').addClass('btn-success');
         setTimeout(() => {
-            this.textContent = '🔊 Play Sound';
-            this.classList.remove('btn-success');
+            $(this).text('🔊 Play Sound').removeClass('btn-success');
         }, 1000);
     });
 
-    // Animation Trigger
-    animateBtn?.addEventListener('click', function() {
+    $('#animate-btn').on('click', function() {
         animateCards();
         playSound();
     });
 
-    // Greeting System
-    greetBtn?.addEventListener('click', function() {
-        const nameInput = document.getElementById('name-input');
-        const greetingDisplay = document.getElementById('greeting-display');
-        const name = nameInput.value.trim();
+    $('#greet-btn').on('click', function() {
+        const nameInput = $('#name-input');
+        const greetingDisplay = $('#greeting-display');
+        const name = nameInput.val().trim();
 
         if (name) {
             const hour = new Date().getHours();
             let greeting;
 
-            // Switch statement for different greetings based on time
             switch(true) {
                 case hour < 12:
                     greeting = `Good morning, ${name}! Ready for some souls-like action?`;
@@ -296,58 +935,52 @@ function initButtonEvents() {
                     greeting = `Good evening, ${name}! Perfect time for dark adventures!`;
             }
 
-            greetingDisplay.textContent = greeting;
-            greetingDisplay.className = 'text-center text-success fade-in';
+            greetingDisplay.text(greeting).attr('class', 'text-center text-success fade-in');
 
             setTimeout(() => {
-                greetingDisplay.className = 'text-center';
+                greetingDisplay.attr('class', 'text-center');
             }, 3000);
 
             playSound();
         } else {
-            greetingDisplay.textContent = 'Please enter your name first!';
-            greetingDisplay.className = 'text-center text-danger';
+            greetingDisplay.text('Please enter your name first!')
+                .attr('class', 'text-center text-danger');
         }
     });
 
-    // Dynamic Content Loading
-    loadContentBtn?.addEventListener('click', function() {
+    $('#load-content').on('click', function() {
         loadRandomContent();
         playSound();
     });
 }
 
-// 2. Keyboard Navigation
 function initKeyboardNavigation() {
     let currentFocus = 0;
-    const focusableElements = document.querySelectorAll('button, a, input, select, textarea');
+    const focusableElements = $('button, a, input, select, textarea');
 
-    document.addEventListener('keydown', function(e) {
+    $(document).on('keydown', function(e) {
         switch(e.key) {
             case 'ArrowDown':
             case 'ArrowRight':
                 e.preventDefault();
                 currentFocus = (currentFocus + 1) % focusableElements.length;
-                focusableElements[currentFocus].focus();
+                focusableElements.eq(currentFocus).focus();
                 break;
             case 'ArrowUp':
             case 'ArrowLeft':
                 e.preventDefault();
                 currentFocus = (currentFocus - 1 + focusableElements.length) % focusableElements.length;
-                focusableElements[currentFocus].focus();
+                focusableElements.eq(currentFocus).focus();
                 break;
             case 'Enter':
-                if (e.target === document.getElementById('name-input')) {
-                    document.getElementById('greet-btn').click();
+                if ($(e.target).is('#name-input')) {
+                    $('#greet-btn').click();
                 }
                 break;
         }
     });
 }
 
-// ===== ADVANCED JAVASCRIPT CONCEPTS =====
-
-// 1. Objects and Methods
 const gameManager = {
     games: [
         { name: 'Dark Souls III', difficulty: 'Hard', genre: 'Action RPG' },
@@ -372,117 +1005,90 @@ const gameManager = {
     }
 };
 
-// 2. Arrays and Higher-Order Functions
 function loadRandomContent() {
-    const facts = [
-        "Dark Souls was inspired by the manga Berserk and classical European architecture.",
-        "Hollow Knight was developed by just 3 people at Team Cherry.",
-        "Elden Ring sold over 20 million copies in its first year.",
-        "Sekiro: Shadows Die Twice won Game of the Year in 2019.",
-        "The term 'Souls-like' was coined by the gaming community to describe games with similar mechanics to Dark Souls.",
-        "Bloodborne's combat system encourages aggressive play with its rally mechanic.",
-        "The average player dies over 100 times in their first Dark Souls playthrough.",
-        "Nioh combines Souls-like combat with Diablo-style loot systems."
-    ];
+    const contentArea = $('#content-area');
+    const randomFact = soulsFacts[Math.floor(Math.random() * soulsFacts.length)];
 
-    const contentArea = document.getElementById('content-area');
-    const randomFact = facts[Math.floor(Math.random() * facts.length)];
-
-    // Using array higher-order functions
-    const formattedFacts = facts
-        .filter(fact => fact.length > 30) // Only facts longer than 30 chars
-        .map(fact => ({
-            text: fact,
-            length: fact.length,
-            words: fact.split(' ').length
-        }));
-
-    const selectedFact = formattedFacts[Math.floor(Math.random() * formattedFacts.length)];
-
-    contentArea.innerHTML = `
+    contentArea.html(`
         <div class="alert alert-dark">
             <h5>🎮 Souls-like Fact</h5>
-            <p class="mb-2">${selectedFact.text}</p>
-            <small class="text-muted">Length: ${selectedFact.length} chars, ${selectedFact.words} words</small>
+            <p class="mb-0">${randomFact}</p>
         </div>
-    `;
+    `);
 
     animateElement(contentArea);
 }
 
-// 3. Sound Effects
 function playSound() {
-    const sound = document.getElementById('sound-effect');
+    const sound = $('#sound-effect')[0];
     if (sound) {
         sound.currentTime = 0;
         sound.play().catch(e => console.log('Audio play failed:', e));
     }
 }
 
-// 4. Animations
 function animateCards() {
-    const cards = document.querySelectorAll('.card');
-
-    cards.forEach((card, index) => {
-        card.style.transform = 'scale(0.9)';
-        card.style.opacity = '0.5';
+    $('.card').each(function(index) {
+        const $card = $(this);
+        
+        $card.css({
+            'transform': 'scale(0.9)',
+            'opacity': '0.5'
+        });
 
         setTimeout(() => {
-            card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            card.style.transform = 'scale(1.05) rotateY(10deg)';
-            card.style.opacity = '1';
-            card.style.boxShadow = '0 15px 35px rgba(220, 53, 69, 0.4)';
+            $card.css({
+                'transition': 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                'transform': 'scale(1.05) rotateY(10deg)',
+                'opacity': '1',
+                'box-shadow': '0 15px 35px rgba(220, 53, 69, 0.4)'
+            });
 
             setTimeout(() => {
-                card.style.transform = 'scale(1) rotateY(0)';
-                card.style.boxShadow = '';
+                $card.css({
+                    'transform': 'scale(1) rotateY(0)',
+                    'box-shadow': ''
+                });
             }, 600);
         }, index * 100);
     });
 }
 
 function animateElement(element) {
-    if (!element) return;
+    if (!element.length) return;
 
-    element.style.transform = 'scale(0.8)';
-    element.style.opacity = '0';
+    element.css({
+        'transform': 'scale(0.8)',
+        'opacity': '0'
+    });
 
     setTimeout(() => {
-        element.style.transition = 'all 0.5s ease';
-        element.style.transform = 'scale(1)';
-        element.style.opacity = '1';
+        element.css({
+            'transition': 'all 0.5s ease',
+            'transform': 'scale(1)',
+            'opacity': '1'
+        });
     }, 50);
 }
 
-// ===== MULTI-STEP FORM =====
 function initMultiStepForm() {
-    const form = document.getElementById('contact-form');
-    if (!form) return;
+    const form = $('#contact-form');
+    if (form.length === 0) return;
 
     let currentStep = 1;
     const totalSteps = 3;
 
     function showStep(step) {
-        // Hide all steps
-        document.querySelectorAll('.form-step').forEach(el => {
-            el.style.display = 'none';
-        });
-
-        // Show current step
-        const currentStepEl = document.getElementById(`step-${step}`);
-        if (currentStepEl) {
-            currentStepEl.style.display = 'block';
-        }
-
-        // Update progress
+        $('.form-step').hide();
+        $(`#step-${step}`).show();
         updateProgress(step);
     }
 
     function updateProgress(step) {
-        const progress = document.getElementById('form-progress');
-        if (progress) {
+        const progress = $('#form-progress');
+        if (progress.length) {
             const percentage = ((step - 1) / (totalSteps - 1)) * 100;
-            progress.style.width = `${percentage}%`;
+            progress.css('width', `${percentage}%`);
         }
     }
 
@@ -491,10 +1097,10 @@ function initMultiStepForm() {
 
         switch(step) {
             case 1:
-                const name = document.getElementById('name');
-                const email = document.getElementById('email');
+                const name = $('#name');
+                const email = $('#email');
 
-                if (!name.value.trim() || name.value.trim().length < 2) {
+                if (!name.val().trim() || name.val().trim().length < 2) {
                     showError('name', 'Name is required and must be at least 2 characters');
                     isValid = false;
                 } else {
@@ -502,7 +1108,7 @@ function initMultiStepForm() {
                 }
 
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!email.value.trim() || !emailRegex.test(email.value)) {
+                if (!email.val().trim() || !emailRegex.test(email.val())) {
                     showError('email', 'Please enter a valid email address');
                     isValid = false;
                 } else {
@@ -511,17 +1117,17 @@ function initMultiStepForm() {
                 break;
 
             case 2:
-                const subject = document.getElementById('subject');
-                const message = document.getElementById('message');
+                const subject = $('#subject');
+                const message = $('#message');
 
-                if (!subject.value) {
+                if (!subject.val()) {
                     showError('subject', 'Please select a subject');
                     isValid = false;
                 } else {
                     showSuccess('subject');
                 }
 
-                if (!message.value.trim() || message.value.trim().length < 10) {
+                if (!message.val().trim() || message.val().trim().length < 10) {
                     showError('message', 'Message must be at least 10 characters');
                     isValid = false;
                 } else {
@@ -534,92 +1140,78 @@ function initMultiStepForm() {
     }
 
     function updateReview() {
-        document.getElementById('review-name').textContent = document.getElementById('name').value;
-        document.getElementById('review-email').textContent = document.getElementById('email').value;
-        document.getElementById('review-subject').textContent = document.getElementById('subject').options[document.getElementById('subject').selectedIndex].text;
-        document.getElementById('review-message').textContent = document.getElementById('message').value;
+        $('#review-name').text($('#name').val());
+        $('#review-email').text($('#email').val());
+        $('#review-subject').text($('#subject option:selected').text());
+        $('#review-message').text($('#message').val());
     }
 
-    // Navigation buttons
-    document.querySelectorAll('.next-step').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (validateStep(currentStep) && currentStep < totalSteps) {
-                currentStep++;
-                if (currentStep === totalSteps) {
-                    updateReview();
-                }
-                showStep(currentStep);
-                playSound();
+    $('.next-step').on('click', function() {
+        if (validateStep(currentStep) && currentStep < totalSteps) {
+            currentStep++;
+            if (currentStep === totalSteps) {
+                updateReview();
             }
-        });
-    });
-
-    document.querySelectorAll('.prev-step').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
-                playSound();
-            }
-        });
-    });
-
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (validateStep(currentStep)) {
-            alert('Thank you for your message! We will get back to you soon.');
-            form.reset();
-            currentStep = 1;
             showStep(currentStep);
             playSound();
         }
     });
 
-    // Initialize first step
+    $('.prev-step').on('click', function() {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+            playSound();
+        }
+    });
+
+    form.on('submit', function(e) {
+        e.preventDefault();
+        if (validateStep(currentStep)) {
+            // This will be handled by the loading spinner function
+            showNotification('Thank you for your message! We will get back to you soon.', 'success');
+            setTimeout(() => {
+                form[0].reset();
+                currentStep = 1;
+                showStep(currentStep);
+            }, 2500);
+            playSound();
+        }
+    });
+
     showStep(1);
 }
 
-// ===== GAME FILTERING SYSTEM =====
 function initGameFiltering() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const gameCards = document.querySelectorAll('.game-card');
+    $('.filter-btn').on('click', function() {
+        const filter = $(this).data('filter');
 
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
+        $('.filter-btn').removeClass('active');
+        $(this).addClass('active');
 
-            // Remove active class from all buttons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            // Add active class to clicked button
-            this.classList.add('active');
-
-            // Filter games
-            gameCards.forEach(card => {
-                if (filter === 'all' || card.getAttribute('data-category') === filter) {
-                    card.style.display = 'block';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'scale(1)';
-                    }, 50);
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.8)';
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                    }, 300);
-                }
-            });
-
-            playSound();
+        $('.game-card').each(function() {
+            const $card = $(this);
+            if (filter === 'all' || $card.data('category') === filter) {
+                $card.show().css({
+                    'opacity': '1',
+                    'transform': 'scale(1)'
+                });
+            } else {
+                $card.css({
+                    'opacity': '0',
+                    'transform': 'scale(0.8)'
+                });
+                setTimeout(() => $card.hide(), 300);
+            }
         });
+
+        playSound();
     });
 }
 
-// ===== LANGUAGE SELECTOR =====
 function initLanguageSelector() {
-    const languageSelect = document.getElementById('language-select');
-    if (!languageSelect) return;
+    const languageSelect = $('#language-select');
+    if (languageSelect.length === 0) return;
 
     const translations = {
         en: {
@@ -645,23 +1237,21 @@ function initLanguageSelector() {
         }
     };
 
-    languageSelect.addEventListener('change', function() {
-        const lang = this.value;
+    languageSelect.on('change', function() {
+        const lang = $(this).val();
         const translation = translations[lang];
 
-        // Update page content based on selected language
-        document.querySelectorAll('[data-translate]').forEach(element => {
-            const key = element.getAttribute('data-translate');
+        $('[data-translate]').each(function() {
+            const key = $(this).data('translate');
             if (translation[key]) {
-                element.textContent = translation[key];
+                $(this).text(translation[key]);
             }
         });
 
-        // Update navigation links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            const text = link.textContent.trim();
+        $('.nav-link').each(function() {
+            const text = $(this).text().trim();
             if (translation[text.toLowerCase()]) {
-                link.textContent = translation[text.toLowerCase()];
+                $(this).text(translation[text.toLowerCase()]);
             }
         });
 
@@ -669,246 +1259,127 @@ function initLanguageSelector() {
         playSound();
     });
 
-    // Load saved language preference
     const savedLang = localStorage.getItem('preferred-language') || 'en';
-    languageSelect.value = savedLang;
-    languageSelect.dispatchEvent(new Event('change'));
+    languageSelect.val(savedLang).trigger('change');
 }
 
-// ===== TASK 1: FORM VALIDATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contact-form');
-
-    if (contactForm && !contactForm.classList.contains('multi-step')) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Reset previous errors
-            resetErrors();
-
-            let isValid = true;
-
-            // Validate Name
-            const name = document.getElementById('name');
-            if (!name.value.trim() || name.value.trim().length < 2) {
-                showError('name', 'Name is required and must be at least 2 characters');
-                isValid = false;
-            } else {
-                showSuccess('name');
-            }
-
-            // Validate Email
-            const email = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email.value.trim() || !emailRegex.test(email.value)) {
-                showError('email', 'Please enter a valid email address');
-                isValid = false;
-            } else {
-                showSuccess('email');
-            }
-
-            // Validate Password
-            const password = document.getElementById('password');
-            if (password && (!password.value || password.value.length < 8)) {
-                showError('password', 'Password must be at least 8 characters');
-                isValid = false;
-            } else if (password) {
-                showSuccess('password');
-            }
-
-            // Validate Password Confirmation
-            const confirmPassword = document.getElementById('confirmPassword');
-            if (confirmPassword && (!confirmPassword.value || confirmPassword.value !== password.value)) {
-                showError('confirmPassword', 'Passwords do not match');
-                isValid = false;
-            } else if (confirmPassword) {
-                showSuccess('confirmPassword');
-            }
-
-            // Validate Subject
-            const subject = document.getElementById('subject');
-            if (subject && !subject.value) {
-                showError('subject', 'Please select a subject');
-                isValid = false;
-            } else if (subject) {
-                showSuccess('subject');
-            }
-
-            // Validate Message
-            const message = document.getElementById('message');
-            if (message && (!message.value.trim() || message.value.trim().length < 10)) {
-                showError('message', 'Message must be at least 10 characters');
-                isValid = false;
-            } else if (message) {
-                showSuccess('message');
-            }
-
-            // If form is valid, show success message
-            if (isValid) {
-                alert('Form submitted successfully! Thank you for contacting us.');
-                contactForm.reset();
-                resetErrors();
-                playSound();
-            }
-        });
-    }
-});
-
 function showError(fieldId, errorMessage) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(fieldId + '-error');
+    const field = $(`#${fieldId}`);
+    const errorElement = $(`#${fieldId}-error`);
 
-    if (field) {
-        field.classList.add('error');
-        field.classList.remove('success');
-    }
-
-    if (errorElement) {
-        errorElement.textContent = errorMessage;
-        errorElement.style.display = 'block';
-    }
+    field.addClass('error').removeClass('success');
+    errorElement.text(errorMessage).show();
 }
 
 function showSuccess(fieldId) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(fieldId + '-error');
+    const field = $(`#${fieldId}`);
+    const errorElement = $(`#${fieldId}-error`);
 
-    if (field) {
-        field.classList.add('success');
-        field.classList.remove('error');
-    }
-
-    if (errorElement) {
-        errorElement.style.display = 'none';
-    }
+    field.addClass('success').removeClass('error');
+    errorElement.hide();
 }
 
 function resetErrors() {
-    const errorMessages = document.querySelectorAll('.error-message');
-    const formControls = document.querySelectorAll('.form-control, .form-select');
-
-    errorMessages.forEach(error => {
-        error.style.display = 'none';
-    });
-
-    formControls.forEach(control => {
-        control.classList.remove('error', 'success');
-    });
+    $('.error-message').hide();
+    $('.form-control, .form-select').removeClass('error success');
 }
 
-// ===== TASK 3: POPUP SUBSCRIPTION FORM =====
-const subscribeBtn = document.getElementById('subscribe-btn');
-const popupOverlay = document.getElementById('popup-overlay');
-const popupForm = document.getElementById('popup-form');
-const popupClose = document.getElementById('popup-close');
-const subscriptionForm = document.getElementById('subscription-form');
+const subscribeBtn = $('#subscribe-btn');
+const popupOverlay = $('#popup-overlay');
+const popupForm = $('#popup-form');
+const popupClose = $('#popup-close');
+const subscriptionForm = $('#subscription-form');
 
-if (subscribeBtn) {
-    subscribeBtn.addEventListener('click', function() {
-        showPopup();
-        playSound();
-    });
-}
+subscribeBtn.on('click', function() {
+    showPopup();
+    playSound();
+});
 
-if (popupClose) {
-    popupClose.addEventListener('click', function() {
+popupClose.on('click', function() {
+    hidePopup();
+    playSound();
+});
+
+popupOverlay.on('click', function() {
+    hidePopup();
+});
+
+subscriptionForm.on('submit', function(e) {
+    e.preventDefault();
+
+    const subName = $('#sub-name').val();
+    const subEmail = $('#sub-email').val();
+
+    if (subName && subEmail) {
+        showNotification(`Thank you for subscribing, ${subName}!`, 'success');
+        subscriptionForm[0].reset();
         hidePopup();
         playSound();
-    });
-}
-
-if (popupOverlay) {
-    popupOverlay.addEventListener('click', function() {
-        hidePopup();
-    });
-}
-
-if (subscriptionForm) {
-    subscriptionForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const subName = document.getElementById('sub-name').value;
-        const subEmail = document.getElementById('sub-email').value;
-
-        if (subName && subEmail) {
-            alert(`Thank you for subscribing, ${subName}! We'll send updates to ${subEmail}.`);
-            subscriptionForm.reset();
-            hidePopup();
-            playSound();
-        } else {
-            alert('Please fill in all required fields.');
-        }
-    });
-}
+    } else {
+        showNotification('Please fill in all required fields.', 'error');
+    }
+});
 
 function showPopup() {
-    if (popupOverlay) popupOverlay.classList.add('show');
-    if (popupForm) popupForm.classList.add('show');
+    popupOverlay.addClass('show');
+    popupForm.addClass('show');
 }
 
 function hidePopup() {
-    if (popupOverlay) popupOverlay.classList.remove('show');
-    if (popupForm) popupForm.classList.remove('show');
+    popupOverlay.removeClass('show');
+    popupForm.removeClass('show');
 }
 
-// ===== TASK 4: CHANGE BACKGROUND COLOR =====
-const colorChangeBtn = document.getElementById('color-change-btn');
+const colorChangeBtn = $('#color-change-btn');
 const colors = [
-    '#0a0a0a', // Original dark
-    '#1a0f1f', // Dark purple
-    '#0f1a1a', // Dark teal
-    '#1a1a0f', // Dark olive
-    '#1f0f0f', // Dark red
-    '#0f0f1f', // Dark blue
-    '#1a0a14', // Dark brown
-    '#141a0a', // Dark green',
+    '#0a0a0a',
+    '#1a0f1f',
+    '#0f1a1a',
+    '#1a1a0f',
+    '#1f0f0f',
+    '#0f0f1f',
+    '#1a0a14',
+    '#141a0a'
 ];
 
 let currentColorIndex = 0;
 
-if (colorChangeBtn) {
-    colorChangeBtn.addEventListener('click', function() {
-        currentColorIndex = (currentColorIndex + 1) % colors.length;
-        document.body.style.transition = 'background-color 0.5s ease';
-        document.body.style.backgroundColor = colors[currentColorIndex];
-
-        // Add rotation animation to button
-        this.style.transform = 'scale(1.1) rotate(360deg)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 300);
-
-        playSound();
+colorChangeBtn.on('click', function() {
+    currentColorIndex = (currentColorIndex + 1) % colors.length;
+    $('body').css({
+        'transition': 'background-color 0.5s ease',
+        'background-color': colors[currentColorIndex]
     });
-}
 
-// ===== TASK 2: ACCORDION FOR FAQS =====
+    $(this).css('transform', 'scale(1.1) rotate(360deg)');
+    setTimeout(() => {
+        $(this).css('transform', '');
+    }, 300);
+
+    playSound();
+});
+
 function initAccordion() {
-    const accordionItems = document.querySelectorAll('.accordion-item');
+    $('.accordion-item').each(function() {
+        const $item = $(this);
+        const header = $item.find('.accordion-header');
+        const content = $item.find('.accordion-content');
 
-    accordionItems.forEach(item => {
-        const header = item.querySelector('.accordion-header');
-        const content = item.querySelector('.accordion-content');
+        if (header.length && content.length) {
+            header.on('click', function() {
+                const isActive = $item.hasClass('active');
 
-        if (header && content) {
-            header.addEventListener('click', function() {
-                const isActive = item.classList.contains('active');
-
-                // Close all accordion items
-                accordionItems.forEach(otherItem => {
-                    otherItem.classList.remove('active');
-                    const otherContent = otherItem.querySelector('.accordion-content');
-                    if (otherContent) {
-                        otherContent.style.maxHeight = '0';
-                        otherContent.style.padding = '0 1rem';
-                    }
+                $('.accordion-item').removeClass('active').find('.accordion-content').css({
+                    'max-height': '0',
+                    'padding': '0 1rem'
                 });
 
-                // Toggle current item
                 if (!isActive) {
-                    item.classList.add('active');
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                    content.style.padding = '1rem';
+                    $item.addClass('active');
+                    content.css({
+                        'max-height': content[0].scrollHeight + 'px',
+                        'padding': '1rem'
+                    });
                     playSound();
                 }
             });
@@ -916,56 +1387,30 @@ function initAccordion() {
     });
 }
 
-// ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all systems
-    initRatingSystem();
-    initThemeSystem();
-    initButtonEvents();
-    initKeyboardNavigation();
-    initMultiStepForm();
-    initGameFiltering();
-    initLanguageSelector();
-    initAccordion();
-
-    // Display game manager data
-    gameManager.displayGames();
-
-    console.log('🚀 Advanced JavaScript features loaded successfully!');
-
-    // Add some interactive elements to existing cards
-    enhanceExistingCards();
-});
-
 function enhanceExistingCards() {
-    // Add hover effects to all cards
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
-            this.style.transition = 'all 0.3s ease';
+    $('.card').on('mouseenter', function() {
+        $(this).css({
+            'transform': 'translateY(-10px) scale(1.02)',
+            'transition': 'all 0.3s ease'
         });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
+    }).on('mouseleave', function() {
+        $(this).css('transform', 'translateY(0) scale(1)');
     });
 }
 
-// Utility function for smooth scrolling
 function smoothScrollTo(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
+    const element = $(`#${elementId}`);
+    if (element.length) {
+        $('html, body').animate({
+            scrollTop: element.offset().top
+        }, 1000);
     }
 }
 
-// Export functions for global access (if needed)
 window.soulsLikeApp = {
     smoothScrollTo,
     playSound,
     animateCards,
-    loadRandomContent
-};
+    loadRandomContent,
+    showNotification
+}
