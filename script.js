@@ -1,4 +1,64 @@
-// ===== JQUERY SETUP =====
+// ===== POPUP SUBSCRIPTION FORM =====
+
+const subscribeBtn = $('#subscribe-btn');
+const popupOverlay = $('#popup-overlay');
+const popupForm = $('#popup-form');
+const popupClose = $('#popup-close');
+const subscriptionForm = $('#subscription-form');
+
+// Initialize popup functionality
+function initPopupForm() {
+    subscribeBtn.on('click', function() {
+        showPopup();
+        playSound();
+    });
+
+    popupClose.on('click', function() {
+        hidePopup();
+        playSound();
+    });
+
+    popupOverlay.on('click', function() {
+        hidePopup();
+    });
+
+    subscriptionForm.on('submit', function(e) {
+        e.preventDefault();
+
+        const subName = $('#sub-name').val();
+        const subEmail = $('#sub-email').val();
+
+        if (subName && subEmail) {
+            showNotification(`Thank you for subscribing, ${subName}!`, 'success');
+            subscriptionForm[0].reset();
+            hidePopup();
+            playSound();
+        } else {
+            showNotification('Please fill in all required fields.', 'error');
+        }
+    });
+
+    // Close popup on Escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && popupForm.hasClass('show')) {
+            hidePopup();
+        }
+    });
+}
+
+function showPopup() {
+    popupOverlay.addClass('show');
+    popupForm.addClass('show');
+    // Focus on first input
+    setTimeout(() => $('#sub-name').focus(), 300);
+}
+
+function hidePopup() {
+    popupOverlay.removeClass('show');
+    popupForm.removeClass('show');
+}
+
+// Add this to your $(document).ready() function:
 $(document).ready(function() {
     console.log("jQuery is ready!");
 
@@ -16,6 +76,7 @@ $(document).ready(function() {
     initCardRatings();
     startFactRotation();
     enhanceExistingCards();
+    initPopupForm(); // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
 
     // jQuery Assignment 7 Tasks
     initRealtimeSearch();
@@ -31,7 +92,6 @@ $(document).ready(function() {
     gameManager.displayGames();
     console.log('🚀 Advanced JavaScript and jQuery features loaded successfully!');
 });
-
 // ===== CORE FUNCTIONS =====
 
 // 1. Random Facts System
