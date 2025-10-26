@@ -104,11 +104,38 @@
                 </div>
             </div>
         </section>
+        <!-- ADD THIS RIGHT BEFORE THE FAQ SECTION in about.html -->
 
-        <!-- Task 2: FAQ Accordion Section -->
+        <!-- Task 3: Search Highlighting in FAQ -->
+        <section class="mb-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="p-4 bg-dark text-white rounded shadow">
+                            <h3 class="text-danger text-center mb-4">🔍 Search in FAQ</h3>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-secondary text-white border-danger"
+                                       placeholder="Type to search in FAQ answers..."
+                                       id="faq-search">
+                                <button class="btn btn-outline-danger" type="button" id="clear-highlight">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <small class="text-muted">Search will highlight matching terms in FAQ answers</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THEN COMES THE EXISTING FAQ SECTION -->
         <section id="faq" class="mb-5">
             <h2 class="text-center text-danger mb-5 display-4">Frequently Asked Questions</h2>
             <div class="accordion-container">
+                <!-- existing FAQ items remain the same -->
+
                 <div class="accordion-item">
                     <div class="accordion-header">
                         <h3 class="accordion-title">What exactly makes a game "Souls-like"?</h3>

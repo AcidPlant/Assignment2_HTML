@@ -1089,7 +1089,57 @@ footer::before {
 .hero-overlay {
     background: rgba(0, 0, 0, 0.6) !important;
 }
+/* ===== SEARCH HIGHLIGHTING STYLES ===== */
 
+.highlight {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000 !important;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    animation: pulse-highlight 2s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+    0%, 100% {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        transform: scale(1);
+    }
+    50% {
+        background: linear-gradient(135deg, #ffed4e, #fff9c4);
+        transform: scale(1.02);
+    }
+}
+
+/* Ensure highlighted text is visible in dark theme */
+.accordion-content .highlight {
+    color: #000 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Search box styling */
+#faq-search {
+    border-radius: 8px 0 0 8px;
+    transition: all 0.3s ease;
+}
+
+#faq-search:focus {
+    border-color: #ff4444 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+    background: #2a2a2a !important;
+}
+
+#clear-highlight {
+    border-radius: 0 8px 8px 0;
+    transition: all 0.3s ease;
+}
+
+#clear-highlight:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
 /* Footer should adapt to theme */
 footer {
     background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%) !important;

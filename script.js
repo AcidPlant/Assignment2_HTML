@@ -1,7 +1,7 @@
 // ===== JQUERY SETUP =====
 $(document).ready(function() {
     console.log("jQuery is ready!");
-    
+
     // Initialize all systems
     initDateTime();
     initWelcomeAlert();
@@ -16,7 +16,7 @@ $(document).ready(function() {
     initCardRatings();
     startFactRotation();
     enhanceExistingCards();
-    
+
     // jQuery Assignment 7 Tasks
     initRealtimeSearch();
     initAutocompleteSearch();
@@ -27,13 +27,10 @@ $(document).ready(function() {
     initNotificationSystem();
     initCopyToClipboard();
     initLazyLoading();
-    
+
     gameManager.displayGames();
     console.log('🚀 Advanced JavaScript and jQuery features loaded successfully!');
 });
-
-// ===== TASK 0: JQUERY SETUP =====
-// Already done with $(document).ready() above
 
 // ===== PART 1: JQUERY SEARCH =====
 
@@ -41,95 +38,138 @@ $(document).ready(function() {
 function initRealtimeSearch() {
     const searchInput = $('#searchInput');
     const gameCards = $('.game-card');
-    
+
     if (searchInput.length && gameCards.length) {
+        // Real-time search on typing
         searchInput.on('keyup', function() {
-            const searchTerm = $(this).val().toLowerCase();
-            
+            performSearch();
+        });
+
+        // Category filter change
+        $('#categoryFilter').on('change', function() {
+            performSearch();
+        });
+
+        // Search button click
+        $('#searchButton').on('click', function() {
+            performSearch();
+        });
+
+        // Enter key support
+        searchInput.on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+
+        function performSearch() {
+            const searchTerm = searchInput.val().toLowerCase().trim();
+            const categoryFilter = $('#categoryFilter').val();
+
+            let visibleCount = 0;
+            let hasActiveFilters = searchTerm !== '' || categoryFilter !== '';
+
             gameCards.each(function() {
-                const cardText = $(this).text().toLowerCase();
-                
-                if (cardText.includes(searchTerm)) {
-                    $(this).fadeIn(300).css({
-                        'opacity': '1',
-                        'transform': 'scale(1)'
+                const $card = $(this);
+                const cardTitle = $card.find('.card-title').text().toLowerCase();
+                const cardText = $card.find('.card-text').text().toLowerCase();
+                const cardCategory = $card.data('category');
+
+                const matchesSearch = searchTerm === '' ||
+                    cardTitle.includes(searchTerm) ||
+                    cardText.includes(searchTerm);
+                const matchesCategory = categoryFilter === '' || cardCategory === categoryFilter;
+
+                if (matchesSearch && matchesCategory) {
+                    $card.stop(true, true).fadeIn(300).css({
+                        'display': 'block',
+                        'opacity': '1'
                     });
+                    visibleCount++;
                 } else {
-                    $(this).fadeOut(300);
+                    $card.stop(true, true).fadeOut(300).css('display', 'none');
                 }
             });
-            
-            // Show "no results" message if needed
-            if (gameCards.filter(':visible').length === 0) {
+
+            // Show/hide no results message
+            if (visibleCount === 0 && hasActiveFilters) {
                 if ($('#no-results').length === 0) {
-                    $('.row.g-4').after('<div id="no-results" class="text-center text-muted py-5"><h3>No games found matching your search</h3></div>');
+                    $('.row.g-4').after(
+                        '<div id="no-results" class="text-center text-muted py-5">' +
+                        '<h3 class="text-danger">🎮 No games found</h3>' +
+                        '<p>Try different keywords or categories</p>' +
+                        '<button class="btn btn-sm btn-outline-danger mt-2" onclick="clearSearch()">Clear Search</button>' +
+                        '</div>'
+                    );
                 }
             } else {
                 $('#no-results').remove();
             }
-        });
+
+            // Update results counter
+            updateResultsCounter(visibleCount, gameCards.length, hasActiveFilters);
+        }
+
+        // Initialize search on page load
+        performSearch();
     }
 }
 
 // Task 2: Autocomplete Search Suggestions
 function initAutocompleteSearch() {
     const searchInput = $('#searchInput');
-    
+
     if (searchInput.length) {
         const games = [
-            'Dark Souls III',
-            'Hollow Knight',
-            'Code Vein',
-            'Blasphemous',
-            'Sekiro: Shadows Die Twice',
-            'Elden Ring',
-            'Salt and Sanctuary',
-            'Nioh 2',
-            'Dark Souls Remastered',
-            'Bloodborne',
-            'Mortal Shell',
-            'Lies of P'
+            'Dark Souls III', 'Hollow Knight', 'Code Vein', 'Blasphemous',
+            'Sekiro: Shadows Die Twice', 'Elden Ring', 'Salt and Sanctuary',
+            'Nioh 2', 'Dark Souls Remastered', 'Bloodborne', 'Mortal Shell', 'Lies of P'
         ];
-        
-        // Create autocomplete container
+
+        // Create autocomplete container if it doesn't exist
         if ($('#autocomplete-list').length === 0) {
-            searchInput.after('<div id="autocomplete-list" class="autocomplete-list"></div>');
+            searchInput.closest('.position-relative').append('<div id="autocomplete-list" class="autocomplete-list"></div>');
         }
-        
+
+        const autocompleteList = $('#autocomplete-list');
+
         searchInput.on('input', function() {
             const value = $(this).val().toLowerCase();
-            const autocompleteList = $('#autocomplete-list');
-            
-            autocompleteList.empty();
-            
-            if (value.length > 0) {
-                const matches = games.filter(game => 
+            autocompleteList.empty().hide();
+
+            if (value.length > 1) {
+                const matches = games.filter(game =>
                     game.toLowerCase().includes(value)
                 );
-                
+
                 if (matches.length > 0) {
                     matches.slice(0, 5).forEach(match => {
                         const item = $('<div class="autocomplete-item"></div>')
-                            .text(match)
+                            .html(`<i class="fas fa-gamepad me-2"></i> ${match}`)
                             .on('click', function() {
-                                searchInput.val(match).trigger('keyup');
+                                searchInput.val(match);
+                                performSearch();
                                 autocompleteList.empty().hide();
                             });
                         autocompleteList.append(item);
                     });
                     autocompleteList.show();
-                } else {
-                    autocompleteList.hide();
                 }
-            } else {
-                autocompleteList.hide();
             }
         });
-        
+
         // Close autocomplete when clicking outside
         $(document).on('click', function(e) {
             if (!$(e.target).closest('#searchInput, #autocomplete-list').length) {
-                $('#autocomplete-list').hide();
+                autocompleteList.hide();
+            }
+        });
+
+        // Close autocomplete when pressing Enter
+        searchInput.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                autocompleteList.hide();
             }
         });
     }
@@ -137,49 +177,62 @@ function initAutocompleteSearch() {
 
 // Task 3: Search Highlighting
 function initSearchHighlighting() {
-    // Add search input for FAQ section
-    const faqSection = $('#faq');
-    
-    if (faqSection.length && $('#faq-search').length === 0) {
-        faqSection.before(`
-            <div class="mb-4">
-                <div class="input-group">
-                    <input type="text" id="faq-search" class="form-control bg-dark text-white border-dark" 
-                           placeholder="Search in FAQs...">
-                    <button id="clear-highlight" class="btn btn-outline-danger">Clear</button>
-                </div>
-            </div>
-        `);
+    // Create and insert search box
+    if ($('#faq-search-container').length === 0) {
+        $('<div id="faq-search-container" class="mb-4">' +
+            '<div class="input-group">' +
+            '<input type="text" class="form-control bg-dark text-white border-danger" ' +
+            'placeholder="🔍 Search in FAQ answers..." id="faq-search">' +
+            '<button class="btn btn-outline-danger" type="button" id="clear-highlight">Clear</button>' +
+            '</div>' +
+            '<small class="text-muted mt-2 d-block">Type to highlight matching terms in FAQ answers</small>' +
+            '</div>').insertBefore('#faq');
     }
-    
-    $('#faq-search').on('keyup', function() {
-        const searchTerm = $(this).val();
-        
-        // Remove previous highlights
+
+    let originalContents = {};
+
+    // Store original content on first run
+    $('.accordion-content').each(function() {
+        const id = $(this).attr('id') || 'content-' + Math.random();
+        $(this).attr('data-content-id', id);
+        if (!originalContents[id]) {
+            originalContents[id] = $(this).html();
+        }
+    });
+
+    $('#faq-search').on('input', function() {
+        const searchTerm = $(this).val().trim();
+
+        // Reset all content first
         $('.accordion-content').each(function() {
-            const content = $(this).html();
-            const cleanContent = content.replace(/<mark class="highlight">(.*?)<\/mark>/g, '$1');
-            $(this).html(cleanContent);
+            const id = $(this).attr('data-content-id');
+            $(this).html(originalContents[id]);
         });
-        
+
+        // Apply highlighting if search term exists
         if (searchTerm.length > 2) {
+            const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+
             $('.accordion-content').each(function() {
-                const content = $(this).html();
-                const regex = new RegExp(`(${searchTerm})`, 'gi');
-                const highlightedContent = content.replace(regex, '<mark class="highlight">$1</mark>');
-                $(this).html(highlightedContent);
+                const currentHtml = $(this).html();
+                const highlightedHtml = currentHtml.replace(regex, '<mark class="highlight">$1</mark>');
+                $(this).html(highlightedHtml);
             });
         }
     });
-    
+
     $('#clear-highlight').on('click', function() {
         $('#faq-search').val('');
+        // Reset all content
         $('.accordion-content').each(function() {
-            const content = $(this).html();
-            const cleanContent = content.replace(/<mark class="highlight">(.*?)<\/mark>/g, '$1');
-            $(this).html(cleanContent);
+            const id = $(this).attr('data-content-id');
+            $(this).html(originalContents[id]);
         });
     });
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 }
 
 // ===== PART 2: UX ENGAGEMENT ELEMENTS =====
@@ -194,14 +247,14 @@ function initScrollProgressBar() {
             </div>
         `);
     }
-    
+
     $(window).on('scroll', function() {
         const windowHeight = $(window).height();
         const documentHeight = $(document).height();
         const scrollTop = $(window).scrollTop();
-        
+
         const progress = (scrollTop / (documentHeight - windowHeight)) * 100;
-        
+
         $('#scroll-progress').css('width', progress + '%');
     });
 }
@@ -209,7 +262,7 @@ function initScrollProgressBar() {
 // Task 5: Animated Number Counter
 function initAnimatedCounter() {
     const counters = $('.stats-counter');
-    
+
     if (counters.length === 0) {
         // Add stats section if not exists
         const statsSection = `
@@ -238,27 +291,27 @@ function initAnimatedCounter() {
                 </div>
             </section>
         `;
-        
+
         $('.main-content').append(statsSection);
     }
-    
+
     let animated = false;
-    
+
     $(window).on('scroll', function() {
         const counters = $('.stats-counter');
-        
+
         if (counters.length > 0 && !animated) {
             const statsSection = counters.closest('.stats-section');
             const sectionTop = statsSection.offset().top;
             const windowBottom = $(window).scrollTop() + $(window).height();
-            
+
             if (windowBottom > sectionTop) {
                 animated = true;
-                
+
                 counters.each(function() {
                     const $this = $(this);
                     const target = parseInt($this.data('target'));
-                    
+
                     $({ counter: 0 }).animate({ counter: target }, {
                         duration: 2000,
                         easing: 'swing',
@@ -277,52 +330,190 @@ function initAnimatedCounter() {
 
 // Task 6: Loading Spinner on Submit
 function initLoadingSpinner() {
-    $('form').on('submit', function(e) {
+    // Contact form submission
+    $('#contact-form').on('submit', function(e) {
+        e.preventDefault();
+
         const submitBtn = $(this).find('button[type="submit"]');
-        
-        if (submitBtn.length) {
-            const originalText = submitBtn.html();
-            
-            submitBtn.prop('disabled', true)
-                .html('<span class="spinner-border spinner-border-sm me-2"></span>Please wait...');
-            
-            // Simulate server call
-            setTimeout(function() {
-                submitBtn.prop('disabled', false).html(originalText);
-                showNotification('Form submitted successfully!', 'success');
-            }, 2000);
+        const originalText = submitBtn.html();
+
+        // Show loading state
+        submitBtn.prop('disabled', true)
+            .html('<span class="spinner-border spinner-border-sm me-2"></span>Submitting...');
+
+        // Simulate server request
+        setTimeout(() => {
+            // Re-enable button
+            submitBtn.prop('disabled', false).html(originalText);
+
+            // Show success notification
+            showNotification('Form submitted successfully! We will contact you soon.', 'success');
+
+            // Optional: Reset form
+            $(this)[0].reset();
+            $('#step-1').show().siblings('.form-step').hide();
+            $('#form-progress').css('width', '0%');
+
+        }, 2000);
+    });
+
+    // Newsletter subscription form
+    $('#subscription-form').on('submit', function(e) {
+        e.preventDefault();
+
+        const email = $('#sub-email').val();
+        const name = $('#sub-name').val();
+
+        if (email && name) {
+            showNotification(`Thank you for subscribing, ${name}! Welcome to our community.`, 'success');
+            $(this)[0].reset();
+            hidePopup();
+        } else {
+            showNotification('Please fill in all required fields.', 'error');
         }
     });
+
+    // Test notification button (for demonstration)
+    if ($('#test-notification-btn').length === 0) {
+        $('nav').after(`
+            <div style="position: fixed; top: 100px; left: 20px; z-index: 9999;">
+                <button id="test-notification-btn" class="btn btn-success btn-sm">
+                    🔔 Test Notifications
+                </button>
+            </div>
+        `);
+
+        $('#test-notification-btn').on('click', function() {
+            showNotification('Form submitted successfully!', 'success');
+            setTimeout(() => showNotification('Error: Please check your input', 'error'), 1500);
+            setTimeout(() => showNotification('New message received', 'info'), 3000);
+        });
+    }
 }
 
 // ===== PART 3: IMPROVE WEB APP FUNCTIONALITY =====
 
 // Task 7: Notification System
 function initNotificationSystem() {
-    // Add notification container
+    // Create notification container if it doesn't exist
     if ($('#notification-container').length === 0) {
-        $('body').append('<div id="notification-container"></div>');
+        $('body').append(`
+            <div id="notification-container" style="
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 99999;
+                max-width: 400px;
+            "></div>
+        `);
     }
 }
 
-function showNotification(message, type = 'success') {
+// Global function to show notifications
+window.showNotification = function(message, type = 'success', duration = 4000) {
+    console.log('Showing notification:', message, type);
+
+    const icon = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️',
+        warning: '⚠️'
+    }[type] || '📢';
+
+    const notificationId = 'notification-' + Date.now();
+
     const notification = $(`
-        <div class="notification notification-${type}">
-            <span class="notification-icon">
-                ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
-            </span>
-            <span class="notification-message">${message}</span>
+        <div id="${notificationId}" class="custom-notification custom-notification-${type}" style="
+            background: linear-gradient(135deg, ${getNotificationColor(type)});
+            color: white;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-left: 4px solid ${getNotificationBorderColor(type)};
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 400px;
+            min-width: 300px;
+        ">
+            <span class="notification-icon" style="font-size: 1.4em;">${icon}</span>
+            <span class="notification-message" style="flex: 1; font-weight: 500;">${message}</span>
+            <button class="notification-close" style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.2em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">×</button>
         </div>
     `);
-    
+
     $('#notification-container').append(notification);
-    
-    setTimeout(() => notification.addClass('show'), 100);
-    
+
+    // Animate in
     setTimeout(() => {
-        notification.removeClass('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+        notification.css({
+            'transform': 'translateX(0)',
+            'opacity': '1'
+        });
+    }, 100);
+
+    // Close button handler
+    notification.find('.notification-close').on('click', function() {
+        closeNotification(notificationId);
+    });
+
+    // Auto close after duration
+    if (duration > 0) {
+        setTimeout(() => {
+            closeNotification(notificationId);
+        }, duration);
+    }
+
+    return notificationId;
+};
+
+function closeNotification(id) {
+    const notification = $('#' + id);
+    if (notification.length) {
+        notification.css({
+            'transform': 'translateX(400px)',
+            'opacity': '0'
+        });
+        setTimeout(() => {
+            notification.remove();
+        }, 400);
+    }
+}
+
+function getNotificationColor(type) {
+    const colors = {
+        success: '#28a745, #20c997',
+        error: '#dc3545, #e83e8c',
+        info: '#17a2b8, #6f42c1',
+        warning: '#ffc107, #fd7e14'
+    };
+    return colors[type] || colors.info;
+}
+
+function getNotificationBorderColor(type) {
+    const colors = {
+        success: '#1e7e34',
+        error: '#c82333',
+        info: '#138496',
+        warning: '#e0a800'
+    };
+    return colors[type] || colors.info;
 }
 
 // Task 8: Copy to Clipboard Button
@@ -335,22 +526,21 @@ function initCopyToClipboard() {
                     <span class="copy-icon">📋</span> Copy
                 </button>
             `);
-            
+
             $(this).after(copyBtn);
         }
     });
-    
+
     $('.copy-btn').on('click', function() {
         const $btn = $(this);
-        const index = $btn.data('index');
         const text = $btn.prev('.card-text').text();
-        
+
         // Copy to clipboard
         navigator.clipboard.writeText(text).then(() => {
             $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
-            
+
             showNotification('Copied to clipboard!', 'success');
-            
+
             setTimeout(() => {
                 $btn.html('<span class="copy-icon">📋</span> Copy').removeClass('btn-success');
             }, 2000);
@@ -365,7 +555,7 @@ function initLazyLoading() {
     $('img').each(function() {
         const $img = $(this);
         const src = $img.attr('src');
-        
+
         // Store original src and replace with placeholder
         if (src && !$img.hasClass('lazy-loaded')) {
             $img.attr('data-src', src)
@@ -373,7 +563,7 @@ function initLazyLoading() {
                 .addClass('lazy-load');
         }
     });
-    
+
     function lazyLoad() {
         $('.lazy-load').each(function() {
             const $img = $(this);
@@ -381,7 +571,7 @@ function initLazyLoading() {
             const imgBottom = imgTop + $img.height();
             const windowTop = $(window).scrollTop();
             const windowBottom = windowTop + $(window).height();
-            
+
             if (imgBottom > windowTop && imgTop < windowBottom + 200) {
                 const src = $img.attr('data-src');
                 if (src) {
@@ -395,79 +585,43 @@ function initLazyLoading() {
             }
         });
     }
-    
+
     $(window).on('scroll resize', lazyLoad);
     lazyLoad(); // Initial load
 }
 
-// ===== EXISTING FUNCTIONS (Modified for jQuery) =====
+// ===== HELPER FUNCTIONS =====
 
-// Modified Welcome Alert - Show only once with name input
-function initWelcomeAlert() {
-    // Check if user has already seen the welcome message
-    if (localStorage.getItem('welcomeShown')) {
-        return;
-    }
-    
-    const hour = new Date().getHours();
-    let greeting;
-    
-    if (hour < 12) {
-        greeting = "Good morning, Hollow! ☀️";
-    } else if (hour < 18) {
-        greeting = "Good afternoon, Ashen One! ⚔️";
-    } else {
-        greeting = "Good evening, Hunter! 🌙";
-    }
-    
-    const alertDiv = $(`
-        <div class="custom-welcome-alert">
-            <div class="welcome-alert-content">
-                <span class="welcome-close">&times;</span>
-                <h3 class="text-danger mb-3">🎮 Welcome to Souls-like Games</h3>
-                <p class="mb-3">${greeting}</p>
-                <p class="mb-3">Ready to conquer some bosses?</p>
-                <div class="input-group mb-3">
-                    <input type="text" id="welcome-name-input" class="form-control bg-dark text-white" placeholder="Enter your name">
-                    <button id="welcome-submit" class="btn btn-danger">Continue</button>
-                </div>
-            </div>
-        </div>
-    `);
-    
-    $('body').append(alertDiv);
-    
-    setTimeout(() => alertDiv.addClass('show'), 500);
-    
-    function closeWelcome(userName) {
-        alertDiv.removeClass('show');
-        setTimeout(() => alertDiv.remove(), 300);
-        localStorage.setItem('welcomeShown', 'true');
-        if (userName) {
-            localStorage.setItem('userName', userName);
-            showNotification(`Welcome, ${userName}! Happy gaming!`, 'success');
-        }
-    }
-    
-    $('#welcome-submit').on('click', function() {
-        const name = $('#welcome-name-input').val().trim();
-        if (name) {
-            closeWelcome(name);
-        } else {
-            showNotification('Please enter your name', 'error');
-        }
-    });
-    
-    $('#welcome-name-input').on('keypress', function(e) {
-        if (e.which === 13) {
-            $('#welcome-submit').click();
-        }
-    });
-    
-    $('.welcome-close').on('click', () => closeWelcome());
+function clearSearch() {
+    $('#searchInput').val('');
+    $('#categoryFilter').val('');
+    performSearch();
+    $('#searchInput').focus();
 }
 
-// Update DateTime function with jQuery
+function updateResultsCounter(visible, total, hasFilters) {
+    // Remove existing counter
+    $('.results-counter').remove();
+
+    if (hasFilters) {
+        const counter = $(`
+            <div class="results-counter alert alert-info mt-3">
+                <strong>${visible}</strong> of <strong>${total}</strong> games found
+                <button class="btn btn-sm btn-outline-danger ms-3" onclick="clearSearch()">
+                    Show All Games
+                </button>
+            </div>
+        `);
+        $('.search-form-container').after(counter);
+    }
+}
+
+// Make functions globally available
+window.performSearch = performSearch;
+window.clearSearch = clearSearch;
+
+// ===== EXISTING FUNCTIONS (KEEP THESE) =====
+
 function initDateTime() {
     function updateDateTime() {
         const now = new Date();
@@ -483,7 +637,7 @@ function initDateTime() {
         };
 
         const formattedDate = now.toLocaleDateString('en-US', options);
-        
+
         $('#datetime-display').html(`
             <div class="alert alert-dark text-center">
                 <div class="fw-bold text-danger">📅 Current Date & Time</div>
@@ -496,7 +650,68 @@ function initDateTime() {
     updateDateTime();
 }
 
-// ===== KEEP EXISTING FUNCTIONS =====
+function initWelcomeAlert() {
+    if (localStorage.getItem('welcomeShown')) {
+        return;
+    }
+
+    const hour = new Date().getHours();
+    let greeting;
+
+    if (hour < 12) {
+        greeting = "Good morning, Hollow! ☀️";
+    } else if (hour < 18) {
+        greeting = "Good afternoon, Ashen One! ⚔️";
+    } else {
+        greeting = "Good evening, Hunter! 🌙";
+    }
+
+    const alertDiv = $(`
+        <div class="custom-welcome-alert">
+            <div class="welcome-alert-content">
+                <span class="welcome-close">&times;</span>
+                <h3 class="text-danger mb-3">🎮 Welcome to Souls-like Games</h3>
+                <p class="mb-3">${greeting}</p>
+                <p class="mb-3">Ready to conquer some bosses?</p>
+                <div class="input-group mb-3">
+                    <input type="text" id="welcome-name-input" class="form-control bg-dark text-white" placeholder="Enter your name">
+                    <button id="welcome-submit" class="btn btn-danger">Continue</button>
+                </div>
+            </div>
+        </div>
+    `);
+
+    $('body').append(alertDiv);
+
+    setTimeout(() => alertDiv.addClass('show'), 500);
+
+    function closeWelcome(userName) {
+        alertDiv.removeClass('show');
+        setTimeout(() => alertDiv.remove(), 300);
+        localStorage.setItem('welcomeShown', 'true');
+        if (userName) {
+            localStorage.setItem('userName', userName);
+            showNotification(`Welcome, ${userName}! Happy gaming!`, 'success');
+        }
+    }
+
+    $('#welcome-submit').on('click', function() {
+        const name = $('#welcome-name-input').val().trim();
+        if (name) {
+            closeWelcome(name);
+        } else {
+            showNotification('Please enter your name', 'error');
+        }
+    });
+
+    $('#welcome-name-input').on('keypress', function(e) {
+        if (e.which === 13) {
+            $('#welcome-submit').click();
+        }
+    });
+
+    $('.welcome-close').on('click', () => closeWelcome());
+}
 
 const soulsFacts = [
     "Dark Souls was inspired by the manga Berserk and classical European architecture.",
@@ -519,9 +734,9 @@ let factInterval;
 function displayRandomFact() {
     const factContainer = $('#random-fact-container');
     if (factContainer.length === 0) return;
-    
+
     const fact = soulsFacts[currentFactIndex];
-    
+
     factContainer.html(`
         <div class="fact-content" onclick="changeFactManually()">
             <div class="fact-icon">💡</div>
@@ -529,7 +744,7 @@ function displayRandomFact() {
             <small class="fact-hint">Click to change • Auto-updates every 20s</small>
         </div>
     `);
-    
+
     factContainer.find('.fact-content').css({
         'opacity': '0',
         'transform': 'translateY(20px)'
@@ -556,7 +771,7 @@ function initCardRatings() {
     $('.game-card').each(function(cardIndex) {
         const cardBody = $(this).find('.card-body');
         if (cardBody.length === 0) return;
-        
+
         const ratingContainer = $(`
             <div class="card-rating-system mt-3 mb-3">
                 <div class="rating-label text-center mb-2">
@@ -574,16 +789,16 @@ function initCardRatings() {
                 </div>
             </div>
         `);
-        
+
         const buttonGroup = cardBody.find('.btn-group');
         if (buttonGroup.length) {
             buttonGroup.parent().prepend(ratingContainer);
         } else {
             cardBody.append(ratingContainer);
         }
-        
+
         let currentRating = 0;
-        
+
         ratingContainer.find('.star-small').on('click', function() {
             const rating = parseInt($(this).data('rating'));
             currentRating = rating;
@@ -689,7 +904,6 @@ function initThemeSystem() {
             'transition': 'all 0.5s ease'
         });
 
-        // Cards
         $('.card').css({
             'backgroundColor': theme.card,
             'color': theme.text,
@@ -697,159 +911,17 @@ function initThemeSystem() {
             'transition': 'all 0.5s ease'
         });
 
-        // Background dark elements
         $('.bg-dark').css({
             'backgroundColor': theme.dark,
             'color': theme.text,
             'transition': 'all 0.5s ease'
         });
 
-        // Background secondary elements
         $('.bg-secondary').css({
             'backgroundColor': theme.secondary,
             'color': theme.text,
             'transition': 'all 0.5s ease'
         });
-
-        // Accordion items
-        $('.accordion-item').css({
-            'backgroundColor': theme.secondary,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.accordion-header').css({
-            'backgroundColor': theme.dark,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.accordion-content').css({
-            'backgroundColor': theme.card,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Alerts and info boxes
-        $('.alert').each(function() {
-            if ($(this).hasClass('alert-dark')) {
-                $(this).css({
-                    'backgroundColor': theme.dark,
-                    'color': theme.text,
-                    'borderColor': theme.border,
-                    'transition': 'all 0.5s ease'
-                });
-            }
-        });
-
-        // Navbar
-        $('.navbar, .navbar-dark').css({
-            'backgroundColor': theme.card,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.navbar a, .navbar-brand, .nav-link').css({
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Footer
-        $('footer').css({
-            'backgroundColor': theme.dark,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Form controls
-        $('.form-control, .form-select').css({
-            'backgroundColor': theme.dark,
-            'color': theme.text,
-            'borderColor': theme.border,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Progress bars
-        $('.progress').css({
-            'backgroundColor': theme.dark,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Pagination
-        $('.page-link').each(function() {
-            if ($(this).hasClass('bg-dark')) {
-                $(this).css({
-                    'backgroundColor': theme.dark,
-                    'color': theme.text,
-                    'borderColor': theme.border,
-                    'transition': 'all 0.5s ease'
-                });
-            }
-        });
-
-        // Grid sections
-        $('.p-4.bg-dark, .p-4.bg-secondary').each(function() {
-            const bgClass = $(this).hasClass('bg-dark') ? theme.dark : theme.secondary;
-            $(this).css({
-                'backgroundColor': bgClass,
-                'color': theme.text,
-                'transition': 'all 0.5s ease'
-            });
-        });
-
-        // Carousel captions
-        $('.carousel-caption').css({
-            'backgroundColor': 'rgba(0, 0, 0, 0.7)',
-            'transition': 'all 0.5s ease'
-        });
-
-        // Special sections
-        $('.stats-section, .random-facts-section').css({
-            'backgroundColor': theme.dark,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Text colors
-        $('.text-white').css({
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.text-muted').css({
-            'color': theme.text === '#212529' ? '#6c757d' : '#b0b0b0',
-            'transition': 'all 0.5s ease'
-        });
-
-        // Fact container
-        $('.fact-content').css({
-            'backgroundColor': theme.secondary,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Popup forms
-        $('.popup-form, .welcome-alert-content').css({
-            'backgroundColor': theme.secondary,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        // Update button states
-        if (theme === themes.day) {
-            dayThemeBtn.addClass('active');
-            nightThemeBtn.removeClass('active');
-        } else {
-            nightThemeBtn.addClass('active');
-            dayThemeBtn.removeClass('active');
-        }
-
-        // Update CSS variables
-        document.documentElement.style.setProperty('--dark-bg', theme.background);
-        document.documentElement.style.setProperty('--darker-bg', theme.dark);
-        document.documentElement.style.setProperty('--dark-secondary', theme.secondary);
-        document.documentElement.style.setProperty('--text-light', theme.text);
-        document.documentElement.style.setProperty('--border-dark', theme.border);
 
         localStorage.setItem('theme', theme === themes.day ? 'day' : 'night');
     }
@@ -1030,7 +1102,7 @@ function playSound() {
 function animateCards() {
     $('.card').each(function(index) {
         const $card = $(this);
-        
+
         $card.css({
             'transform': 'scale(0.9)',
             'opacity': '0.5'
@@ -1165,20 +1237,7 @@ function initMultiStepForm() {
         }
     });
 
-    form.on('submit', function(e) {
-        e.preventDefault();
-        if (validateStep(currentStep)) {
-            // This will be handled by the loading spinner function
-            showNotification('Thank you for your message! We will get back to you soon.', 'success');
-            setTimeout(() => {
-                form[0].reset();
-                currentStep = 1;
-                showStep(currentStep);
-            }, 2500);
-            playSound();
-        }
-    });
-
+    // Form submission handled in initLoadingSpinner
     showStep(1);
 }
 
@@ -1284,81 +1343,6 @@ function resetErrors() {
     $('.form-control, .form-select').removeClass('error success');
 }
 
-const subscribeBtn = $('#subscribe-btn');
-const popupOverlay = $('#popup-overlay');
-const popupForm = $('#popup-form');
-const popupClose = $('#popup-close');
-const subscriptionForm = $('#subscription-form');
-
-subscribeBtn.on('click', function() {
-    showPopup();
-    playSound();
-});
-
-popupClose.on('click', function() {
-    hidePopup();
-    playSound();
-});
-
-popupOverlay.on('click', function() {
-    hidePopup();
-});
-
-subscriptionForm.on('submit', function(e) {
-    e.preventDefault();
-
-    const subName = $('#sub-name').val();
-    const subEmail = $('#sub-email').val();
-
-    if (subName && subEmail) {
-        showNotification(`Thank you for subscribing, ${subName}!`, 'success');
-        subscriptionForm[0].reset();
-        hidePopup();
-        playSound();
-    } else {
-        showNotification('Please fill in all required fields.', 'error');
-    }
-});
-
-function showPopup() {
-    popupOverlay.addClass('show');
-    popupForm.addClass('show');
-}
-
-function hidePopup() {
-    popupOverlay.removeClass('show');
-    popupForm.removeClass('show');
-}
-
-const colorChangeBtn = $('#color-change-btn');
-const colors = [
-    '#0a0a0a',
-    '#1a0f1f',
-    '#0f1a1a',
-    '#1a1a0f',
-    '#1f0f0f',
-    '#0f0f1f',
-    '#1a0a14',
-    '#141a0a'
-];
-
-let currentColorIndex = 0;
-
-colorChangeBtn.on('click', function() {
-    currentColorIndex = (currentColorIndex + 1) % colors.length;
-    $('body').css({
-        'transition': 'background-color 0.5s ease',
-        'background-color': colors[currentColorIndex]
-    });
-
-    $(this).css('transform', 'scale(1.1) rotate(360deg)');
-    setTimeout(() => {
-        $(this).css('transform', '');
-    }, 300);
-
-    playSound();
-});
-
 function initAccordion() {
     $('.accordion-item').each(function() {
         const $item = $(this);
@@ -1398,19 +1382,9 @@ function enhanceExistingCards() {
     });
 }
 
-function smoothScrollTo(elementId) {
-    const element = $(`#${elementId}`);
-    if (element.length) {
-        $('html, body').animate({
-            scrollTop: element.offset().top
-        }, 1000);
-    }
-}
-
-window.soulsLikeApp = {
-    smoothScrollTo,
-    playSound,
-    animateCards,
-    loadRandomContent,
-    showNotification
-}
+// Test function for notifications
+window.testNotificationSystem = function() {
+    showNotification('Form submitted successfully!', 'success');
+    setTimeout(() => showNotification('Error: Please check your input', 'error'), 1500);
+    setTimeout(() => showNotification('New message received', 'info'), 3000);
+};
