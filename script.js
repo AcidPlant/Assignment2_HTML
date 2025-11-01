@@ -1,3 +1,90 @@
+// ===== DAY/NIGHT MODE WITH LOCAL STORAGE (TASK 6) =====
+
+function initDayNightMode() {
+    // Get saved theme or default to night
+    const savedTheme = localStorage.getItem('theme') || 'night';
+    
+    // Theme definitions
+    const themes = {
+        day: {
+            '--dark-bg': '#f8f9fa',
+            '--darker-bg': '#ffffff',
+            '--dark-secondary': '#e9ecef',
+            '--text-light': '#212529',
+            '--text-gray': '#6c757d',
+            '--border-dark': '#dee2e6'
+        },
+        night: {
+            '--dark-bg': '#0a0a0a',
+            '--darker-bg': '#1a1a1a',
+            '--dark-secondary': '#2a2a2a',
+            '--text-light': '#e0e0e0',
+            '--text-gray': '#b0b0b0',
+            '--border-dark': '#333'
+        }
+    };
+
+    // Apply theme function
+    function applyTheme(themeName) {
+        const theme = themes[themeName];
+        const root = document.documentElement;
+        
+        // Apply CSS variables
+        Object.keys(theme).forEach(key => {
+            root.style.setProperty(key, theme[key]);
+        });
+
+        // Update body classes
+        if (themeName === 'day') {
+            document.body.classList.add('day-mode');
+            document.body.classList.remove('night-mode');
+        } else {
+            document.body.classList.add('night-mode');
+            document.body.classList.remove('day-mode');
+        }
+
+        // Save to localStorage
+        localStorage.setItem('theme', themeName);
+        
+        console.log(`Theme changed to: ${themeName}`);
+    }
+
+    // Apply saved theme on load
+    applyTheme(savedTheme);
+
+    // Day theme button
+    $('#day-theme').on('click', function() {
+        applyTheme('day');
+        showNotification('Day mode activated! ☀️', 'success');
+        playSound();
+    });
+
+    // Night theme button
+    $('#night-theme').on('click', function() {
+        applyTheme('night');
+        showNotification('Night mode activated! 🌙', 'success');
+        playSound();
+    });
+
+    // Toggle theme button
+    $('#theme-toggle').on('click', function() {
+        const currentTheme = localStorage.getItem('theme') || 'night';
+        const newTheme = currentTheme === 'night' ? 'day' : 'night';
+        applyTheme(newTheme);
+        showNotification(`${newTheme === 'day' ? 'Day' : 'Night'} mode activated!`, 'success');
+        playSound();
+    });
+
+    // Random color button (changes background only, doesn't affect theme)
+    $('#random-color').on('click', function() {
+        const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f', '#1f1a0f'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        document.documentElement.style.setProperty('--dark-bg', randomColor);
+        showNotification('Background color changed!', 'info');
+        playSound();
+    });
+}
+
 // ===== POPUP SUBSCRIPTION FORM =====
 
 const subscribeBtn = $('#subscribe-btn');
@@ -6,7 +93,6 @@ const popupForm = $('#popup-form');
 const popupClose = $('#popup-close');
 const subscriptionForm = $('#subscription-form');
 
-// Initialize popup functionality
 function initPopupForm() {
     subscribeBtn.on('click', function() {
         showPopup();
@@ -38,7 +124,6 @@ function initPopupForm() {
         }
     });
 
-    // Close popup on Escape key
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape' && popupForm.hasClass('show')) {
             hidePopup();
@@ -49,7 +134,6 @@ function initPopupForm() {
 function showPopup() {
     popupOverlay.addClass('show');
     popupForm.addClass('show');
-    // Focus on first input
     setTimeout(() => $('#sub-name').focus(), 300);
 }
 
@@ -58,7 +142,8 @@ function hidePopup() {
     popupForm.removeClass('show');
 }
 
-// Add this to your $(document).ready() function:
+// ===== DOCUMENT READY =====
+
 $(document).ready(function() {
     console.log("jQuery is ready!");
 
@@ -66,7 +151,7 @@ $(document).ready(function() {
     initDateTime();
     initWelcomeAlert();
     initRatingSystem();
-    initThemeSystem();
+    initDayNightMode(); // ← Updated function name
     initButtonEvents();
     initKeyboardNavigation();
     initMultiStepForm();
@@ -76,7 +161,7 @@ $(document).ready(function() {
     initCardRatings();
     startFactRotation();
     enhanceExistingCards();
-    initPopupForm(); // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
+    initPopupForm();
 
     // jQuery Assignment 7 Tasks
     initRealtimeSearch();
@@ -92,6 +177,7 @@ $(document).ready(function() {
     gameManager.displayGames();
     console.log('🚀 Advanced JavaScript and jQuery features loaded successfully!');
 });
+
 // ===== CORE FUNCTIONS =====
 
 // 1. Random Facts System
@@ -151,7 +237,8 @@ function startFactRotation() {
 
 // 2. Welcome Alert System
 function initWelcomeAlert() {
-    if (localStorage.getItem('welcomeShown')) {
+    // Check if welcome was already shown in this session
+    if (sessionStorage.getItem('welcomeShown')) {
         return;
     }
 
@@ -188,9 +275,9 @@ function initWelcomeAlert() {
     function closeWelcome(userName) {
         alertDiv.removeClass('show');
         setTimeout(() => alertDiv.remove(), 300);
-        localStorage.setItem('welcomeShown', 'true');
+        sessionStorage.setItem('welcomeShown', 'true');
         if (userName) {
-            localStorage.setItem('userName', userName);
+            sessionStorage.setItem('userName', userName);
             showNotification(`Welcome, ${userName}! Happy gaming!`, 'success');
         }
     }
@@ -280,95 +367,7 @@ function updateCardStars(stars, rating, isHover = false) {
     });
 }
 
-// 4. Theme System
-function initThemeSystem() {
-    const dayThemeBtn = $('#day-theme');
-    const nightThemeBtn = $('#night-theme');
-    const themeToggleBtn = $('#theme-toggle');
-    const randomColorBtn = $('#random-color');
-
-    const themes = {
-        day: {
-            background: '#f8f9fa',
-            text: '#212529',
-            card: '#ffffff',
-            accent: '#dc3545',
-            dark: '#e9ecef',
-            secondary: '#f8f9fa',
-            border: '#dee2e6'
-        },
-        night: {
-            background: '#0a0a0a',
-            text: '#e0e0e0',
-            card: '#1a1a1a',
-            accent: '#dc3545',
-            dark: '#151515',
-            secondary: '#2a2a2a',
-            border: '#333'
-        }
-    };
-
-    function applyTheme(theme) {
-        $('body').css({
-            'backgroundColor': theme.background,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.card').css({
-            'backgroundColor': theme.card,
-            'color': theme.text,
-            'borderColor': theme.border,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.bg-dark').css({
-            'backgroundColor': theme.dark,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        $('.bg-secondary').css({
-            'backgroundColor': theme.secondary,
-            'color': theme.text,
-            'transition': 'all 0.5s ease'
-        });
-
-        localStorage.setItem('theme', theme === themes.day ? 'day' : 'night');
-    }
-
-    dayThemeBtn.on('click', () => {
-        applyTheme(themes.day);
-        playSound();
-    });
-
-    nightThemeBtn.on('click', () => {
-        applyTheme(themes.night);
-        playSound();
-    });
-
-    themeToggleBtn.on('click', () => {
-        const currentTheme = localStorage.getItem('theme') || 'night';
-        const newTheme = currentTheme === 'night' ? 'day' : 'night';
-        applyTheme(themes[newTheme]);
-        playSound();
-    });
-
-    randomColorBtn.on('click', () => {
-        const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        $('body').css({
-            'backgroundColor': randomColor,
-            'transition': 'background-color 0.5s ease'
-        });
-        playSound();
-    });
-
-    const savedTheme = localStorage.getItem('theme') || 'night';
-    applyTheme(themes[savedTheme]);
-}
-
-// 5. Date and Time System
+// 4. Date and Time System
 function initDateTime() {
     function updateDateTime() {
         const now = new Date();
@@ -397,7 +396,7 @@ function initDateTime() {
     updateDateTime();
 }
 
-// 6. Rating System
+// 5. Rating System
 function initRatingSystem() {
     const stars = $('.star');
     const ratingDisplay = $('#rating-display');
@@ -437,7 +436,6 @@ function initRatingSystem() {
 
 // ===== PART 1: JQUERY SEARCH =====
 
-// Task 1: Real-time Search and Live Filter
 function initRealtimeSearch() {
     const searchInput = $('#searchInput');
     const gameCards = $('.game-card');
@@ -451,7 +449,8 @@ function initRealtimeSearch() {
             performSearch();
         });
 
-        $('#searchButton').on('click', function() {
+        $('form').on('submit', function(e) {
+            e.preventDefault();
             performSearch();
         });
 
@@ -512,7 +511,6 @@ function initRealtimeSearch() {
     }
 }
 
-// Task 2: Autocomplete Search Suggestions
 function initAutocompleteSearch() {
     const searchInput = $('#searchInput');
 
@@ -523,8 +521,10 @@ function initAutocompleteSearch() {
             'Nioh 2', 'Dark Souls Remastered', 'Bloodborne', 'Mortal Shell', 'Lies of P'
         ];
 
+        searchInput.wrap('<div class="position-relative"></div>');
+        
         if ($('#autocomplete-list').length === 0) {
-            searchInput.closest('.position-relative').append('<div id="autocomplete-list" class="autocomplete-list"></div>');
+            searchInput.parent().append('<div id="autocomplete-list" class="autocomplete-list"></div>');
         }
 
         const autocompleteList = $('#autocomplete-list');
@@ -568,7 +568,6 @@ function initAutocompleteSearch() {
     }
 }
 
-// Task 3: Search Highlighting
 function initSearchHighlighting() {
     if ($('#faq-search-container').length === 0) {
         $('<div id="faq-search-container" class="mb-4">' +
@@ -625,7 +624,6 @@ function initSearchHighlighting() {
 
 // ===== PART 2: UX ENGAGEMENT ELEMENTS =====
 
-// Task 4: Colorful and Stylized Scroll Progress Bar
 function initScrollProgressBar() {
     if ($('#scroll-progress').length === 0) {
         $('body').prepend(`
@@ -646,7 +644,6 @@ function initScrollProgressBar() {
     });
 }
 
-// Task 5: Animated Number Counter
 function initAnimatedCounter() {
     const counters = $('.stats-counter');
 
@@ -714,7 +711,6 @@ function initAnimatedCounter() {
     });
 }
 
-// Task 6: Loading Spinner on Submit
 function initLoadingSpinner() {
     $('#contact-form').on('submit', function(e) {
         e.preventDefault();
@@ -748,15 +744,10 @@ function initLoadingSpinner() {
             showNotification('Please fill in all required fields.', 'error');
         }
     });
-
-
-
-
 }
 
 // ===== PART 3: IMPROVE WEB APP FUNCTIONALITY =====
 
-// Task 7: Notification System
 function initNotificationSystem() {
     if ($('#notification-container').length === 0) {
         $('body').append(`
@@ -771,7 +762,6 @@ function initNotificationSystem() {
     }
 }
 
-// Global function to show notifications
 window.showNotification = function(message, type = 'success', duration = 4000) {
     console.log('Showing notification:', message, type);
 
@@ -875,7 +865,6 @@ function getNotificationBorderColor(type) {
     return colors[type] || colors.info;
 }
 
-// Task 8: Copy to Clipboard Button
 function initCopyToClipboard() {
     $('.card-text').each(function(index) {
         if ($(this).text().length > 50) {
@@ -905,7 +894,6 @@ function initCopyToClipboard() {
     });
 }
 
-// Task 9: Image Lazy Loading
 function initLazyLoading() {
     $('img').each(function() {
         const $img = $(this);
@@ -954,7 +942,7 @@ function initButtonEvents() {
 
         timeDisplay.html(`
             <div class="alert alert-info">
-                <h4>🕒 Current Time</h4>
+                <h4>🕐 Current Time</h4>
                 <p class="mb-0 fs-4">${timeString}</p>
             </div>
         `);
@@ -1300,11 +1288,11 @@ function initLanguageSelector() {
             }
         });
 
-        localStorage.setItem('preferred-language', lang);
+        sessionStorage.setItem('preferred-language', lang);
         playSound();
     });
 
-    const savedLang = localStorage.getItem('preferred-language') || 'en';
+    const savedLang = sessionStorage.getItem('preferred-language') || 'en';
     languageSelect.val(savedLang).trigger('change');
 }
 
@@ -1373,7 +1361,9 @@ function enhanceExistingCards() {
 function clearSearch() {
     $('#searchInput').val('');
     $('#categoryFilter').val('');
-    performSearch();
+    if (typeof performSearch === 'function') {
+        performSearch();
+    }
     $('#searchInput').focus();
 }
 
@@ -1389,16 +1379,59 @@ function updateResultsCounter(visible, total, hasFilters) {
                 </button>
             </div>
         `);
-        $('.search-form-container').after(counter);
+        $('.row.g-4').first().before(counter);
     }
+}
+
+function performSearch() {
+    const searchInput = $('#searchInput');
+    const gameCards = $('.game-card');
+    const searchTerm = searchInput.val().toLowerCase().trim();
+    const categoryFilter = $('#categoryFilter').val();
+
+    let visibleCount = 0;
+    let hasActiveFilters = searchTerm !== '' || categoryFilter !== '';
+
+    gameCards.each(function() {
+        const $card = $(this);
+        const cardTitle = $card.find('.card-title').text().toLowerCase();
+        const cardText = $card.find('.card-text').text().toLowerCase();
+        const cardCategory = $card.data('category');
+
+        const matchesSearch = searchTerm === '' ||
+            cardTitle.includes(searchTerm) ||
+            cardText.includes(searchTerm);
+        const matchesCategory = categoryFilter === '' || cardCategory === categoryFilter;
+
+        if (matchesSearch && matchesCategory) {
+            $card.stop(true, true).fadeIn(300).css({
+                'display': 'block',
+                'opacity': '1'
+            });
+            visibleCount++;
+        } else {
+            $card.stop(true, true).fadeOut(300).css('display', 'none');
+        }
+    });
+
+    if (visibleCount === 0 && hasActiveFilters) {
+        if ($('#no-results').length === 0) {
+            $('.row.g-4').after(
+                '<div id="no-results" class="text-center text-muted py-5">' +
+                '<h3 class="text-danger">🎮 No games found</h3>' +
+                '<p>Try different keywords or categories</p>' +
+                '<button class="btn btn-sm btn-outline-danger mt-2" onclick="clearSearch()">Clear Search</button>' +
+                '</div>'
+            );
+        }
+    } else {
+        $('#no-results').remove();
+    }
+
+    updateResultsCounter(visibleCount, gameCards.length, hasActiveFilters);
 }
 
 // Make functions globally available
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 window.changeFactManually = changeFactManually;
-window.testNotificationSystem = function() {
-    showNotification('Form submitted successfully!', 'success');
-    setTimeout(() => showNotification('Error: Please check your input', 'error'), 1500);
-    setTimeout(() => showNotification('New message received', 'info'), 3000);
-};
