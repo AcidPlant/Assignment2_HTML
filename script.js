@@ -1,10 +1,132 @@
-// ===== DAY/NIGHT MODE WITH LOCAL STORAGE (TASK 6) =====
+// ===== SOUND SYSTEM - WORKS ON ALL PAGES =====
+function playSound() {
+    try {
+        let sound = document.getElementById('sound-effect');
+        
+        if (!sound) {
+            sound = document.createElement('audio');
+            sound.id = 'sound-effect';
+            sound.innerHTML = '<source src="electronic-pulse-8bit-293075.mp3" type="audio/mpeg">';
+            sound.preload = 'auto';
+            document.body.appendChild(sound);
+        }
+        
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Audio play failed:', e));
+        }
+    } catch (e) {
+        console.log('Sound error:', e);
+    }
+}
 
+// ===== NOTIFICATION SYSTEM - FIXED =====
+function initNotificationSystem() {
+    if ($('#notification-container').length === 0) {
+        $('body').append(`
+            <div id="notification-container" style="
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 99999;
+                max-width: 400px;
+                pointer-events: none;
+            "></div>
+        `);
+    }
+}
+
+window.showNotification = function(message, type = 'success', duration = 4000) {
+    const icon = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️',
+        warning: '⚠️'
+    }[type] || '📢';
+
+    const colors = {
+        success: '#28a745, #20c997',
+        error: '#dc3545, #e83e8c',
+        info: '#17a2b8, #6f42c1',
+        warning: '#ffc107, #fd7e14'
+    };
+
+    const borderColors = {
+        success: '#1e7e34',
+        error: '#c82333',
+        info: '#138496',
+        warning: '#e0a800'
+    };
+
+    const notificationId = 'notification-' + Date.now();
+
+    const notification = $(`
+        <div id="${notificationId}" style="
+            background: linear-gradient(135deg, ${colors[type] || colors.info});
+            color: white;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-left: 4px solid ${borderColors[type] || borderColors.info};
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 400px;
+            min-width: 300px;
+            pointer-events: all;
+        ">
+            <span style="font-size: 1.4em;">${icon}</span>
+            <span style="flex: 1; font-weight: 500;">${message}</span>
+            <button class="notification-close-btn" style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.2em;
+                cursor: pointer;
+                padding: 0;
+                width: 24px;
+                height: 24px;
+            ">×</button>
+        </div>
+    `);
+
+    $('#notification-container').append(notification);
+
+    setTimeout(() => {
+        notification.css({
+            'transform': 'translateX(0)',
+            'opacity': '1'
+        });
+    }, 100);
+
+    notification.find('.notification-close-btn').on('click', function() {
+        notification.css({
+            'transform': 'translateX(400px)',
+            'opacity': '0'
+        });
+        setTimeout(() => notification.remove(), 400);
+        playSound();
+    });
+
+    if (duration > 0) {
+        setTimeout(() => {
+            notification.css({
+                'transform': 'translateX(400px)',
+                'opacity': '0'
+            });
+            setTimeout(() => notification.remove(), 400);
+        }, duration);
+    }
+};
+
+// ===== DAY/NIGHT MODE WITH LOCAL STORAGE =====
 function initDayNightMode() {
-    // Get saved theme or default to night
     const savedTheme = localStorage.getItem('theme') || 'night';
     
-    // Theme definitions
     const themes = {
         day: {
             '--dark-bg': '#f8f9fa',
@@ -24,17 +146,14 @@ function initDayNightMode() {
         }
     };
 
-    // Apply theme function
     function applyTheme(themeName) {
         const theme = themes[themeName];
         const root = document.documentElement;
         
-        // Apply CSS variables
         Object.keys(theme).forEach(key => {
             root.style.setProperty(key, theme[key]);
         });
 
-        // Update body classes
         if (themeName === 'day') {
             document.body.classList.add('day-mode');
             document.body.classList.remove('night-mode');
@@ -43,30 +162,37 @@ function initDayNightMode() {
             document.body.classList.remove('day-mode');
         }
 
-        // Save to localStorage
         localStorage.setItem('theme', themeName);
-        
-        console.log(`Theme changed to: ${themeName}`);
+        updateColorChangeIcon(themeName);
     }
 
-    // Apply saved theme on load
+    function updateColorChangeIcon(theme) {
+        const colorChangeBtn = $('#color-change-btn');
+        if (colorChangeBtn.length) {
+            if (theme === 'day') {
+                colorChangeBtn.html('🌙');
+                colorChangeBtn.attr('title', 'Switch to Night Mode');
+            } else {
+                colorChangeBtn.html('☀️');
+                colorChangeBtn.attr('title', 'Switch to Day Mode');
+            }
+        }
+    }
+
     applyTheme(savedTheme);
 
-    // Day theme button
     $('#day-theme').on('click', function() {
         applyTheme('day');
         showNotification('Day mode activated! ☀️', 'success');
         playSound();
     });
 
-    // Night theme button
     $('#night-theme').on('click', function() {
         applyTheme('night');
         showNotification('Night mode activated! 🌙', 'success');
         playSound();
     });
 
-    // Toggle theme button
     $('#theme-toggle').on('click', function() {
         const currentTheme = localStorage.getItem('theme') || 'night';
         const newTheme = currentTheme === 'night' ? 'day' : 'night';
@@ -75,68 +201,53 @@ function initDayNightMode() {
         playSound();
     });
 
-    // Random color button - FIXED - Now cycles between themes and random colors
-    let colorCycleMode = 0; // 0 = random colors, 1 = day mode, 2 = night mode
-    
-    $('#random-color, #color-change-btn').on('click', function() {
-        colorCycleMode = (colorCycleMode + 1) % 3;
-        
-        switch(colorCycleMode) {
-            case 0:
-                // Random background color
-                const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f', '#1f1a0f'];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                document.documentElement.style.setProperty('--dark-bg', randomColor);
-                showNotification('Random background color! 🎨', 'info');
-                break;
-            case 1:
-                // Switch to day mode
-                applyTheme('day');
-                showNotification('Day mode activated! ☀️', 'success');
-                break;
-            case 2:
-                // Switch to night mode
-                applyTheme('night');
-                showNotification('Night mode activated! 🌙', 'success');
-                break;
-        }
+    $(document).on('click', '#color-change-btn', function() {
+        const currentTheme = localStorage.getItem('theme') || 'night';
+        const newTheme = currentTheme === 'night' ? 'day' : 'night';
+        applyTheme(newTheme);
+        showNotification(`${newTheme === 'day' ? 'Day' : 'Night'} mode activated!`, 'success');
+        playSound();
+    });
+
+    $('#random-color').on('click', function() {
+        const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f', '#1f1a0f'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        document.documentElement.style.setProperty('--dark-bg', randomColor);
+        showNotification('Random background color! 🎨', 'info');
         playSound();
     });
 }
 
 // ===== POPUP SUBSCRIPTION FORM =====
-
-const subscribeBtn = $('#subscribe-btn');
-const popupOverlay = $('#popup-overlay');
-const popupForm = $('#popup-form');
-const popupClose = $('#popup-close');
-const subscriptionForm = $('#subscription-form');
-
 function initPopupForm() {
-    subscribeBtn.on('click', function() {
-        showPopup();
+    $('#subscribe-btn').on('click', function() {
+        $('#popup-overlay').addClass('show');
+        $('#popup-form').addClass('show');
+        setTimeout(() => $('#sub-name').focus(), 300);
         playSound();
     });
 
-    popupClose.on('click', function() {
-        hidePopup();
+    $('#popup-close').on('click', function() {
+        $('#popup-overlay').removeClass('show');
+        $('#popup-form').removeClass('show');
         playSound();
     });
 
-    popupOverlay.on('click', function() {
-        hidePopup();
+    $('#popup-overlay').on('click', function() {
+        $('#popup-overlay').removeClass('show');
+        $('#popup-form').removeClass('show');
     });
 
-    subscriptionForm.on('submit', function(e) {
+    $('#subscription-form').on('submit', function(e) {
         e.preventDefault();
-
         const subName = $('#sub-name').val();
         const subEmail = $('#sub-email').val();
 
         if (subName && subEmail) {
             showNotification(`Thank you for subscribing, ${subName}!`, 'success');
-            subscriptionForm[0].reset();
-            hidePopup();
+            $('#subscription-form')[0].reset();
+            $('#popup-overlay').removeClass('show');
+            $('#popup-form').removeClass('show');
             playSound();
         } else {
             showNotification('Please fill in all required fields.', 'error');
@@ -144,53 +255,34 @@ function initPopupForm() {
     });
 
     $(document).on('keydown', function(e) {
-        if (e.key === 'Escape' && popupForm.hasClass('show')) {
-            hidePopup();
+        if (e.key === 'Escape' && $('#popup-form').hasClass('show')) {
+            $('#popup-overlay').removeClass('show');
+            $('#popup-form').removeClass('show');
         }
     });
 }
 
-function showPopup() {
-    popupOverlay.addClass('show');
-    popupForm.addClass('show');
-    setTimeout(() => $('#sub-name').focus(), 300);
-}
-
-function hidePopup() {
-    popupOverlay.removeClass('show');
-    popupForm.removeClass('show');
-}
-
-// ===== PAGINATION FUNCTIONALITY - FIXED =====
-
+// ===== PAGINATION FUNCTIONALITY =====
 function initPagination() {
-    // Show page function
     window.showPage = function(pageNum) {
-        // Hide all pages
         $('.games-page').hide();
-        
-        // Show selected page
         $(`#page-${pageNum}`).fadeIn(400);
         
-        // Update pagination buttons
         $('.pagination .page-item').removeClass('active');
         $(`.pagination .page-item:has(a[href="#page-${pageNum}"])`).addClass('active');
         
-        // Update Previous button
         if (pageNum === 1) {
             $('.pagination .page-item:first-child').addClass('disabled');
         } else {
             $('.pagination .page-item:first-child').removeClass('disabled');
         }
         
-        // Update Next button
         if (pageNum === 2) {
             $('.pagination .page-item:last-child').addClass('disabled');
         } else {
             $('.pagination .page-item:last-child').removeClass('disabled');
         }
         
-        // Scroll to top of games section
         $('html, body').animate({
             scrollTop: $('.games-page:visible').offset().top - 100
         }, 400);
@@ -198,7 +290,6 @@ function initPagination() {
         playSound();
     };
     
-    // Handle pagination clicks
     $('.pagination .page-link').on('click', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
@@ -213,16 +304,16 @@ function initPagination() {
         }
     });
     
-    // Show page 1 by default
-    showPage(1);
+    if ($('.games-page').length > 0) {
+        showPage(1);
+    }
 }
 
 // ===== DOCUMENT READY =====
-
 $(document).ready(function() {
     console.log("jQuery is ready!");
 
-    // Initialize all systems
+    initNotificationSystem();
     initDateTime();
     initWelcomeAlert();
     initRatingSystem();
@@ -237,26 +328,24 @@ $(document).ready(function() {
     startFactRotation();
     enhanceExistingCards();
     initPopupForm();
-    initPagination(); // ADDED
-
-    // jQuery Assignment 7 Tasks
+    initPagination();
     initRealtimeSearch();
     initAutocompleteSearch();
     initSearchHighlighting();
     initScrollProgressBar();
     initAnimatedCounter();
     initLoadingSpinner();
-    initNotificationSystem();
     initCopyToClipboard();
     initLazyLoading();
 
-    gameManager.displayGames();
-    console.log('🚀 Advanced JavaScript and jQuery features loaded successfully!');
+    if (typeof gameManager !== 'undefined') {
+        gameManager.displayGames();
+    }
+    
+    console.log('🚀 All features loaded successfully!');
 });
 
 // ===== CORE FUNCTIONS =====
-
-// 1. Random Facts System
 const soulsFacts = [
     "Dark Souls was inspired by the manga Berserk and classical European architecture.",
     "Hollow Knight was developed by just 3 people at Team Cherry.",
@@ -292,9 +381,7 @@ function displayRandomFact() {
     factContainer.find('.fact-content').css({
         'opacity': '0',
         'transform': 'translateY(20px)'
-    }).animate({
-        opacity: 1
-    }, 500).css('transform', 'translateY(0)');
+    }).animate({ opacity: 1 }, 500).css('transform', 'translateY(0)');
 }
 
 function changeFactManually() {
@@ -304,16 +391,16 @@ function changeFactManually() {
 }
 
 function startFactRotation() {
-    displayRandomFact();
-    factInterval = setInterval(() => {
-        currentFactIndex = (currentFactIndex + 1) % soulsFacts.length;
+    if ($('#random-fact-container').length > 0) {
         displayRandomFact();
-    }, 20000);
+        factInterval = setInterval(() => {
+            currentFactIndex = (currentFactIndex + 1) % soulsFacts.length;
+            displayRandomFact();
+        }, 20000);
+    }
 }
 
-// 2. Welcome Alert System
 function initWelcomeAlert() {
-    // Check if welcome was already shown in this session
     if (sessionStorage.getItem('welcomeShown')) {
         return;
     }
@@ -345,7 +432,6 @@ function initWelcomeAlert() {
     `);
 
     $('body').append(alertDiv);
-
     setTimeout(() => alertDiv.addClass('show'), 500);
 
     function closeWelcome(userName) {
@@ -362,6 +448,7 @@ function initWelcomeAlert() {
         const name = $('#welcome-name-input').val().trim();
         if (name) {
             closeWelcome(name);
+            playSound();
         } else {
             showNotification('Please enter your name', 'error');
         }
@@ -373,16 +460,16 @@ function initWelcomeAlert() {
         }
     });
 
-    $('.welcome-close').on('click', () => closeWelcome());
+    $('.welcome-close').on('click', () => {
+        closeWelcome();
+        playSound();
+    });
 }
 
-// 3. Card Ratings System - FIXED
 function initCardRatings() {
     $('.game-card').each(function(cardIndex) {
         const cardBody = $(this).find('.card-body');
         if (cardBody.length === 0) return;
-
-        // Check if rating already exists
         if (cardBody.find('.card-rating-system').length > 0) return;
 
         const ratingContainer = $(`
@@ -446,8 +533,9 @@ function updateCardStars(stars, rating, isHover = false) {
     });
 }
 
-// 4. Date and Time System
 function initDateTime() {
+    if ($('#datetime-display').length === 0) return;
+    
     function updateDateTime() {
         const now = new Date();
         const options = {
@@ -475,10 +563,11 @@ function initDateTime() {
     updateDateTime();
 }
 
-// 5. Rating System
 function initRatingSystem() {
     const stars = $('.star');
     const ratingDisplay = $('#rating-display');
+    if (stars.length === 0) return;
+    
     let currentRating = 0;
 
     stars.on('click', function() {
@@ -513,8 +602,6 @@ function initRatingSystem() {
     }
 }
 
-// ===== PART 1: JQUERY SEARCH =====
-
 function initRealtimeSearch() {
     const searchInput = $('#searchInput');
     const gameCards = $('.game-card');
@@ -526,18 +613,12 @@ function initRealtimeSearch() {
 
         $('#categoryFilter').on('change', function() {
             performSearch();
+            playSound();
         });
 
         $('form').on('submit', function(e) {
             e.preventDefault();
             performSearch();
-        });
-
-        searchInput.on('keypress', function(e) {
-            if (e.which === 13) {
-                e.preventDefault();
-                performSearch();
-            }
         });
 
         function performSearch() {
@@ -600,7 +681,9 @@ function initAutocompleteSearch() {
             'Nioh 2', 'Dark Souls Remastered', 'Bloodborne', 'Mortal Shell', 'Lies of P'
         ];
 
-        searchInput.wrap('<div class="position-relative"></div>');
+        if (searchInput.parent().hasClass('position-relative') === false) {
+            searchInput.wrap('<div class="position-relative"></div>');
+        }
         
         if ($('#autocomplete-list').length === 0) {
             searchInput.parent().append('<div id="autocomplete-list" class="autocomplete-list"></div>');
@@ -620,11 +703,12 @@ function initAutocompleteSearch() {
                 if (matches.length > 0) {
                     matches.slice(0, 5).forEach(match => {
                         const item = $('<div class="autocomplete-item"></div>')
-                            .html(`<i class="fas fa-gamepad me-2"></i> ${match}`)
+                            .html(`🎮 ${match}`)
                             .on('click', function() {
                                 searchInput.val(match);
                                 performSearch();
                                 autocompleteList.empty().hide();
+                                playSound();
                             });
                         autocompleteList.append(item);
                     });
@@ -638,17 +722,11 @@ function initAutocompleteSearch() {
                 autocompleteList.hide();
             }
         });
-
-        searchInput.on('keydown', function(e) {
-            if (e.key === 'Enter') {
-                autocompleteList.hide();
-            }
-        });
     }
 }
 
 function initSearchHighlighting() {
-    if ($('#faq-search-container').length === 0) {
+    if ($('#faq').length > 0 && $('#faq-search-container').length === 0) {
         $('<div id="faq-search-container" class="mb-4">' +
             '<div class="input-group">' +
             '<input type="text" class="form-control bg-dark text-white border-danger" ' +
@@ -657,51 +735,51 @@ function initSearchHighlighting() {
             '</div>' +
             '<small class="text-muted mt-2 d-block">Type to highlight matching terms in FAQ answers</small>' +
             '</div>').insertBefore('#faq');
-    }
 
-    let originalContents = {};
-
-    $('.accordion-content').each(function() {
-        const id = $(this).attr('id') || 'content-' + Math.random();
-        $(this).attr('data-content-id', id);
-        if (!originalContents[id]) {
-            originalContents[id] = $(this).html();
-        }
-    });
-
-    $('#faq-search').on('input', function() {
-        const searchTerm = $(this).val().trim();
+        let originalContents = {};
 
         $('.accordion-content').each(function() {
-            const id = $(this).attr('data-content-id');
-            $(this).html(originalContents[id]);
+            const id = $(this).attr('id') || 'content-' + Math.random();
+            $(this).attr('data-content-id', id);
+            if (!originalContents[id]) {
+                originalContents[id] = $(this).html();
+            }
         });
 
-        if (searchTerm.length > 2) {
-            const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+        $('#faq-search').on('input', function() {
+            const searchTerm = $(this).val().trim();
 
             $('.accordion-content').each(function() {
-                const currentHtml = $(this).html();
-                const highlightedHtml = currentHtml.replace(regex, '<mark class="highlight">$1</mark>');
-                $(this).html(highlightedHtml);
+                const id = $(this).attr('data-content-id');
+                $(this).html(originalContents[id]);
             });
-        }
-    });
 
-    $('#clear-highlight').on('click', function() {
-        $('#faq-search').val('');
-        $('.accordion-content').each(function() {
-            const id = $(this).attr('data-content-id');
-            $(this).html(originalContents[id]);
+            if (searchTerm.length > 2) {
+                const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+
+                $('.accordion-content').each(function() {
+                    const currentHtml = $(this).html();
+                    const highlightedHtml = currentHtml.replace(regex, '<mark class="highlight">$1</mark>');
+                    $(this).html(highlightedHtml);
+                });
+                playSound();
+            }
         });
-    });
 
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        $('#clear-highlight').on('click', function() {
+            $('#faq-search').val('');
+            $('.accordion-content').each(function() {
+                const id = $(this).attr('data-content-id');
+                $(this).html(originalContents[id]);
+            });
+            playSound();
+        });
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
     }
 }
-
-// ===== PART 2: UX ENGAGEMENT ELEMENTS =====
 
 function initScrollProgressBar() {
     if ($('#scroll-progress').length === 0) {
@@ -718,15 +796,12 @@ function initScrollProgressBar() {
         const scrollTop = $(window).scrollTop();
 
         const progress = (scrollTop / (documentHeight - windowHeight)) * 100;
-
         $('#scroll-progress').css('width', progress + '%');
     });
 }
 
 function initAnimatedCounter() {
-    const counters = $('.stats-counter');
-
-    if (counters.length === 0) {
+    if ($('.stats-counter').length === 0 && $('.main-content').length > 0) {
         const statsSection = `
             <section class="stats-section py-5 bg-dark">
                 <div class="container">
@@ -764,6 +839,8 @@ function initAnimatedCounter() {
 
         if (counters.length > 0 && !animated) {
             const statsSection = counters.closest('.stats-section');
+            if (statsSection.length === 0) return;
+            
             const sectionTop = statsSection.offset().top;
             const windowBottom = $(window).scrollTop() + $(window).height();
 
@@ -806,151 +883,16 @@ function initLoadingSpinner() {
             $(this)[0].reset();
             $('#step-1').show().siblings('.form-step').hide();
             $('#form-progress').css('width', '0%');
+            playSound();
         }, 2000);
     });
-
-    $('#subscription-form').on('submit', function(e) {
-        e.preventDefault();
-
-        const email = $('#sub-email').val();
-        const name = $('#sub-name').val();
-
-        if (email && name) {
-            showNotification(`Thank you for subscribing, ${name}! Welcome to our community.`, 'success');
-            $(this)[0].reset();
-            hidePopup();
-        } else {
-            showNotification('Please fill in all required fields.', 'error');
-        }
-    });
-}
-
-// ===== PART 3: IMPROVE WEB APP FUNCTIONALITY =====
-
-function initNotificationSystem() {
-    if ($('#notification-container').length === 0) {
-        $('body').append(`
-            <div id="notification-container" style="
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                z-index: 99999;
-                max-width: 400px;
-            "></div>
-        `);
-    }
-}
-
-window.showNotification = function(message, type = 'success', duration = 4000) {
-    console.log('Showing notification:', message, type);
-
-    const icon = {
-        success: '✅',
-        error: '❌',
-        info: 'ℹ️',
-        warning: '⚠️'
-    }[type] || '📢';
-
-    const notificationId = 'notification-' + Date.now();
-
-    const notification = $(`
-        <div id="${notificationId}" class="custom-notification custom-notification-${type}" style="
-            background: linear-gradient(135deg, ${getNotificationColor(type)});
-            color: white;
-            padding: 16px 20px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border-left: 4px solid ${getNotificationBorderColor(type)};
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transform: translateX(400px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 400px;
-            min-width: 300px;
-        ">
-            <span class="notification-icon" style="font-size: 1.4em;">${icon}</span>
-            <span class="notification-message" style="flex: 1; font-weight: 500;">${message}</span>
-            <button class="notification-close" style="
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.2em;
-                cursor: pointer;
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">×</button>
-        </div>
-    `);
-
-    $('#notification-container').append(notification);
-
-    setTimeout(() => {
-        notification.css({
-            'transform': 'translateX(0)',
-            'opacity': '1'
-        });
-    }, 100);
-
-    notification.find('.notification-close').on('click', function() {
-        closeNotification(notificationId);
-    });
-
-    if (duration > 0) {
-        setTimeout(() => {
-            closeNotification(notificationId);
-        }, duration);
-    }
-
-    return notificationId;
-};
-
-function closeNotification(id) {
-    const notification = $('#' + id);
-    if (notification.length) {
-        notification.css({
-            'transform': 'translateX(400px)',
-            'opacity': '0'
-        });
-        setTimeout(() => {
-            notification.remove();
-        }, 400);
-    }
-}
-
-function getNotificationColor(type) {
-    const colors = {
-        success: '#28a745, #20c997',
-        error: '#dc3545, #e83e8c',
-        info: '#17a2b8, #6f42c1',
-        warning: '#ffc107, #fd7e14'
-    };
-    return colors[type] || colors.info;
-}
-
-function getNotificationBorderColor(type) {
-    const colors = {
-        success: '#1e7e34',
-        error: '#c82333',
-        info: '#138496',
-        warning: '#e0a800'
-    };
-    return colors[type] || colors.info;
 }
 
 function initCopyToClipboard() {
-    // Add copy buttons to all game cards
     $('.card-text').each(function(index) {
         const $cardText = $(this);
         const $card = $cardText.closest('.card-body');
         
-        // Check if copy button already exists
         if ($card.find('.copy-btn').length > 0) return;
         
         if ($cardText.text().length > 50) {
@@ -964,7 +906,6 @@ function initCopyToClipboard() {
         }
     });
 
-    // Handle copy button clicks
     $(document).on('click', '.copy-btn', function() {
         const $btn = $(this);
         const text = $btn.prev('.card-text').text();
@@ -972,6 +913,7 @@ function initCopyToClipboard() {
         navigator.clipboard.writeText(text).then(() => {
             $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
             showNotification('Copied to clipboard!', 'success');
+            playSound();
             setTimeout(() => {
                 $btn.html('<span class="copy-icon">📋</span> Copy Description').removeClass('btn-success');
             }, 2000);
@@ -986,7 +928,7 @@ function initLazyLoading() {
         const $img = $(this);
         const src = $img.attr('src');
 
-        if (src && !$img.hasClass('lazy-loaded')) {
+        if (src && !$img.hasClass('lazy-loaded') && !$img.hasClass('lazy-load')) {
             $img.attr('data-src', src)
                 .attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
                 .addClass('lazy-load');
@@ -1018,8 +960,6 @@ function initLazyLoading() {
     $(window).on('scroll resize', lazyLoad);
     lazyLoad();
 }
-
-// ===== EXISTING FUNCTIONALITY =====
 
 function initButtonEvents() {
     $('#time-btn').on('click', function() {
@@ -1096,15 +1036,19 @@ function initKeyboardNavigation() {
         switch(e.key) {
             case 'ArrowDown':
             case 'ArrowRight':
-                e.preventDefault();
-                currentFocus = (currentFocus + 1) % focusableElements.length;
-                focusableElements.eq(currentFocus).focus();
+                if (!$(e.target).is('input, textarea')) {
+                    e.preventDefault();
+                    currentFocus = (currentFocus + 1) % focusableElements.length;
+                    focusableElements.eq(currentFocus).focus();
+                }
                 break;
             case 'ArrowUp':
             case 'ArrowLeft':
-                e.preventDefault();
-                currentFocus = (currentFocus - 1 + focusableElements.length) % focusableElements.length;
-                focusableElements.eq(currentFocus).focus();
+                if (!$(e.target).is('input, textarea')) {
+                    e.preventDefault();
+                    currentFocus = (currentFocus - 1 + focusableElements.length) % focusableElements.length;
+                    focusableElements.eq(currentFocus).focus();
+                }
                 break;
             case 'Enter':
                 if ($(e.target).is('#name-input')) {
@@ -1151,14 +1095,7 @@ function loadRandomContent() {
     `);
 
     animateElement(contentArea);
-}
-
-function playSound() {
-    const sound = $('#sound-effect')[0];
-    if (sound) {
-        sound.currentTime = 0;
-        sound.play().catch(e => console.log('Audio play failed:', e));
-    }
+    playSound();
 }
 
 function animateCards() {
@@ -1380,7 +1317,7 @@ function initLanguageSelector() {
     });
 
     const savedLang = sessionStorage.getItem('preferred-language') || 'en';
-    languageSelect.val(savedLang).trigger('change');
+    languageSelect.val(savedLang);
 }
 
 function showError(fieldId, errorMessage) {
@@ -1399,11 +1336,6 @@ function showSuccess(fieldId) {
     errorElement.hide();
 }
 
-function resetErrors() {
-    $('.error-message').hide();
-    $('.form-control, .form-select').removeClass('error success');
-}
-
 function initAccordion() {
     $('.accordion-item').each(function() {
         const $item = $(this);
@@ -1411,7 +1343,7 @@ function initAccordion() {
         const content = $item.find('.accordion-content');
 
         if (header.length && content.length) {
-            header.on('click', function() {
+            header.off('click').on('click', function() {
                 const isActive = $item.hasClass('active');
 
                 $('.accordion-item').removeClass('active').find('.accordion-content').css({
@@ -1443,8 +1375,6 @@ function enhanceExistingCards() {
     });
 }
 
-// ===== HELPER FUNCTIONS =====
-
 function clearSearch() {
     $('#searchInput').val('');
     $('#categoryFilter').val('');
@@ -1452,6 +1382,7 @@ function clearSearch() {
         performSearch();
     }
     $('#searchInput').focus();
+    playSound();
 }
 
 function updateResultsCounter(visible, total, hasFilters) {
@@ -1518,8 +1449,6 @@ function performSearch() {
     updateResultsCounter(visibleCount, gameCards.length, hasActiveFilters);
 }
 
-// Make functions globally available
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 window.changeFactManually = changeFactManually;
-window.showPage = showPage;
