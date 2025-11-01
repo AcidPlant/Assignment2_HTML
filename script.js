@@ -75,12 +75,31 @@ function initDayNightMode() {
         playSound();
     });
 
-    // Random color button (changes background only, doesn't affect theme)
-    $('#random-color').on('click', function() {
-        const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f', '#1f1a0f'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        document.documentElement.style.setProperty('--dark-bg', randomColor);
-        showNotification('Background color changed!', 'info');
+    // Random color button - FIXED - Now cycles between themes and random colors
+    let colorCycleMode = 0; // 0 = random colors, 1 = day mode, 2 = night mode
+    
+    $('#random-color, #color-change-btn').on('click', function() {
+        colorCycleMode = (colorCycleMode + 1) % 3;
+        
+        switch(colorCycleMode) {
+            case 0:
+                // Random background color
+                const colors = ['#1a0f1f', '#0f1a1a', '#1a1a0f', '#1f0f0f', '#0f0f1f', '#1f1a0f'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                document.documentElement.style.setProperty('--dark-bg', randomColor);
+                showNotification('Random background color! 🎨', 'info');
+                break;
+            case 1:
+                // Switch to day mode
+                applyTheme('day');
+                showNotification('Day mode activated! ☀️', 'success');
+                break;
+            case 2:
+                // Switch to night mode
+                applyTheme('night');
+                showNotification('Night mode activated! 🌙', 'success');
+                break;
+        }
         playSound();
     });
 }
@@ -142,6 +161,62 @@ function hidePopup() {
     popupForm.removeClass('show');
 }
 
+// ===== PAGINATION FUNCTIONALITY - FIXED =====
+
+function initPagination() {
+    // Show page function
+    window.showPage = function(pageNum) {
+        // Hide all pages
+        $('.games-page').hide();
+        
+        // Show selected page
+        $(`#page-${pageNum}`).fadeIn(400);
+        
+        // Update pagination buttons
+        $('.pagination .page-item').removeClass('active');
+        $(`.pagination .page-item:has(a[href="#page-${pageNum}"])`).addClass('active');
+        
+        // Update Previous button
+        if (pageNum === 1) {
+            $('.pagination .page-item:first-child').addClass('disabled');
+        } else {
+            $('.pagination .page-item:first-child').removeClass('disabled');
+        }
+        
+        // Update Next button
+        if (pageNum === 2) {
+            $('.pagination .page-item:last-child').addClass('disabled');
+        } else {
+            $('.pagination .page-item:last-child').removeClass('disabled');
+        }
+        
+        // Scroll to top of games section
+        $('html, body').animate({
+            scrollTop: $('.games-page:visible').offset().top - 100
+        }, 400);
+        
+        playSound();
+    };
+    
+    // Handle pagination clicks
+    $('.pagination .page-link').on('click', function(e) {
+        e.preventDefault();
+        const href = $(this).attr('href');
+        
+        if ($(this).parent().hasClass('disabled')) {
+            return;
+        }
+        
+        if (href === '#page-1' || href === '#page-2') {
+            const pageNum = href.replace('#page-', '');
+            showPage(parseInt(pageNum));
+        }
+    });
+    
+    // Show page 1 by default
+    showPage(1);
+}
+
 // ===== DOCUMENT READY =====
 
 $(document).ready(function() {
@@ -151,7 +226,7 @@ $(document).ready(function() {
     initDateTime();
     initWelcomeAlert();
     initRatingSystem();
-    initDayNightMode(); // ← Updated function name
+    initDayNightMode();
     initButtonEvents();
     initKeyboardNavigation();
     initMultiStepForm();
@@ -162,6 +237,7 @@ $(document).ready(function() {
     startFactRotation();
     enhanceExistingCards();
     initPopupForm();
+    initPagination(); // ADDED
 
     // jQuery Assignment 7 Tasks
     initRealtimeSearch();
@@ -300,11 +376,14 @@ function initWelcomeAlert() {
     $('.welcome-close').on('click', () => closeWelcome());
 }
 
-// 3. Card Ratings System
+// 3. Card Ratings System - FIXED
 function initCardRatings() {
     $('.game-card').each(function(cardIndex) {
         const cardBody = $(this).find('.card-body');
         if (cardBody.length === 0) return;
+
+        // Check if rating already exists
+        if (cardBody.find('.card-rating-system').length > 0) return;
 
         const ratingContainer = $(`
             <div class="card-rating-system mt-3 mb-3">
@@ -326,7 +405,7 @@ function initCardRatings() {
 
         const buttonGroup = cardBody.find('.btn-group');
         if (buttonGroup.length) {
-            buttonGroup.parent().prepend(ratingContainer);
+            buttonGroup.before(ratingContainer);
         } else {
             cardBody.append(ratingContainer);
         }
@@ -866,19 +945,27 @@ function getNotificationBorderColor(type) {
 }
 
 function initCopyToClipboard() {
+    // Add copy buttons to all game cards
     $('.card-text').each(function(index) {
-        if ($(this).text().length > 50) {
+        const $cardText = $(this);
+        const $card = $cardText.closest('.card-body');
+        
+        // Check if copy button already exists
+        if ($card.find('.copy-btn').length > 0) return;
+        
+        if ($cardText.text().length > 50) {
             const copyBtn = $(`
                 <button class="btn btn-sm btn-outline-light mt-2 copy-btn" data-index="${index}">
-                    <span class="copy-icon">📋</span> Copy
+                    <span class="copy-icon">📋</span> Copy Description
                 </button>
             `);
 
-            $(this).after(copyBtn);
+            $cardText.after(copyBtn);
         }
     });
 
-    $('.copy-btn').on('click', function() {
+    // Handle copy button clicks
+    $(document).on('click', '.copy-btn', function() {
         const $btn = $(this);
         const text = $btn.prev('.card-text').text();
 
@@ -886,7 +973,7 @@ function initCopyToClipboard() {
             $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
             showNotification('Copied to clipboard!', 'success');
             setTimeout(() => {
-                $btn.html('<span class="copy-icon">📋</span> Copy').removeClass('btn-success');
+                $btn.html('<span class="copy-icon">📋</span> Copy Description').removeClass('btn-success');
             }, 2000);
         }).catch(err => {
             showNotification('Failed to copy', 'error');
@@ -1435,3 +1522,4 @@ function performSearch() {
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 window.changeFactManually = changeFactManually;
+window.showPage = showPage;
