@@ -2,7 +2,7 @@
 function playSound() {
     try {
         let sound = document.getElementById('sound-effect');
-        
+
         if (!sound) {
             sound = document.createElement('audio');
             sound.id = 'sound-effect';
@@ -10,7 +10,7 @@ function playSound() {
             sound.preload = 'auto';
             document.body.appendChild(sound);
         }
-        
+
         if (sound) {
             sound.currentTime = 0;
             sound.play().catch(e => console.log('Audio play failed:', e));
@@ -126,7 +126,7 @@ window.showNotification = function(message, type = 'success', duration = 4000) {
 // ===== DAY/NIGHT MODE WITH LOCAL STORAGE =====
 function initDayNightMode() {
     const savedTheme = localStorage.getItem('theme') || 'night';
-    
+
     const themes = {
         day: {
             '--dark-bg': '#f8f9fa',
@@ -149,7 +149,7 @@ function initDayNightMode() {
     function applyTheme(themeName) {
         const theme = themes[themeName];
         const root = document.documentElement;
-        
+
         Object.keys(theme).forEach(key => {
             root.style.setProperty(key, theme[key]);
         });
@@ -267,56 +267,56 @@ function initPagination() {
     window.showPage = function(pageNum) {
         $('.games-page').hide();
         $(`#page-${pageNum}`).fadeIn(400);
-        
+
         $('.pagination .page-item').removeClass('active');
         $(`.pagination .page-item:has(a[href="#page-${pageNum}"])`).addClass('active');
-        
+
         if (pageNum === 1) {
             $('.pagination .page-item:first-child').addClass('disabled');
         } else {
             $('.pagination .page-item:first-child').removeClass('disabled');
         }
-        
+
         if (pageNum === 2) {
             $('.pagination .page-item:last-child').addClass('disabled');
         } else {
             $('.pagination .page-item:last-child').removeClass('disabled');
         }
-        
+
         $('html, body').animate({
             scrollTop: $('.games-page:visible').offset().top - 100
         }, 400);
-        
+
         playSound();
     };
-    
+
     $('.pagination .page-link').on('click', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
-        
+
         if ($(this).parent().hasClass('disabled')) {
             return;
         }
-        
+
         if (href === '#page-1' || href === '#page-2') {
             const pageNum = href.replace('#page-', '');
             showPage(parseInt(pageNum));
         }
     });
-    
+
     if ($('.games-page').length > 0) {
         showPage(1);
     }
 }
 
-// ===== DOCUMENT READY =====
+// В функции $(document).ready добавьте:
 $(document).ready(function() {
     console.log("jQuery is ready!");
 
+    // Initialize systems in correct order
     initNotificationSystem();
     initDateTime();
     initWelcomeAlert();
-    initRatingSystem();
     initDayNightMode();
     initButtonEvents();
     initKeyboardNavigation();
@@ -324,12 +324,9 @@ $(document).ready(function() {
     initGameFiltering();
     initLanguageSelector();
     initAccordion();
-    initCardRatings();
-    startFactRotation();
-    enhanceExistingCards();
     initPopupForm();
     initPagination();
-    initRealtimeSearch();
+    initEnhancedSearch();
     initAutocompleteSearch();
     initSearchHighlighting();
     initScrollProgressBar();
@@ -338,13 +335,15 @@ $(document).ready(function() {
     initCopyToClipboard();
     initLazyLoading();
 
-    if (typeof gameManager !== 'undefined') {
-        gameManager.displayGames();
-    }
-    
+    // Initialize rating system after auth system
+    setTimeout(() => {
+        if (typeof RatingSystem !== 'undefined') {
+            window.ratingSystem = new RatingSystem();
+        }
+    }, 1000);
+
     console.log('🚀 All features loaded successfully!');
 });
-
 // ===== CORE FUNCTIONS =====
 const soulsFacts = [
     "Dark Souls was inspired by the manga Berserk and classical European architecture.",
@@ -535,7 +534,7 @@ function updateCardStars(stars, rating, isHover = false) {
 
 function initDateTime() {
     if ($('#datetime-display').length === 0) return;
-    
+
     function updateDateTime() {
         const now = new Date();
         const options = {
@@ -562,403 +561,314 @@ function initDateTime() {
     setInterval(updateDateTime, 1000);
     updateDateTime();
 }
-
-function initRatingSystem() {
-    const stars = $('.star');
-    const ratingDisplay = $('#rating-display');
-    if (stars.length === 0) return;
-    
-    let currentRating = 0;
-
-    stars.on('click', function() {
-        const rating = parseInt($(this).data('rating'));
-        currentRating = rating;
-        updateStars(rating);
-        ratingDisplay.text(`Your rating: ${rating}/5`).attr('class', 'mb-0 text-success');
-        playSound();
-    }).on('mouseover', function() {
-        const rating = parseInt($(this).data('rating'));
-        updateStars(rating, true);
-    }).on('mouseout', function() {
-        updateStars(currentRating);
-    });
-
-    function updateStars(rating, isHover = false) {
-        stars.each(function(index) {
-            if (index < rating) {
-                $(this).css({
-                    'color': '#ffd700',
-                    'text-shadow': '0 0 10px gold',
-                    'transform': 'scale(1.2)'
-                });
-            } else {
-                $(this).css({
-                    'color': isHover ? '#ffd70066' : '#666',
-                    'text-shadow': 'none',
-                    'transform': 'scale(1)'
-                });
-            }
-        });
-    }
-}
-
-function initRealtimeSearch() {
-    const searchInput = $('#searchInput');
-    const gameCards = $('.game-card');
-
-    if (searchInput.length && gameCards.length) {
-        searchInput.on('keyup', function() {
-            performSearch();
-        });
-
-        $('#categoryFilter').on('change', function() {
-            performSearch();
-            playSound();
-        });
-
-        $('form').on('submit', function(e) {
-            e.preventDefault();
-            performSearch();
-        });
-
-        function performSearch() {
-            const searchTerm = searchInput.val().toLowerCase().trim();
-            const categoryFilter = $('#categoryFilter').val();
-
-            let visibleCount = 0;
-            let hasActiveFilters = searchTerm !== '' || categoryFilter !== '';
-
-            gameCards.each(function() {
-                const $card = $(this);
-                const cardTitle = $card.find('.card-title').text().toLowerCase();
-                const cardText = $card.find('.card-text').text().toLowerCase();
-                const cardCategory = $card.data('category');
-
-                const matchesSearch = searchTerm === '' ||
-                    cardTitle.includes(searchTerm) ||
-                    cardText.includes(searchTerm);
-                const matchesCategory = categoryFilter === '' || cardCategory === categoryFilter;
-
-                if (matchesSearch && matchesCategory) {
-                    $card.stop(true, true).fadeIn(300).css({
-                        'display': 'block',
-                        'opacity': '1'
-                    });
-                    visibleCount++;
-                } else {
-                    $card.stop(true, true).fadeOut(300).css('display', 'none');
-                }
-            });
-
-            if (visibleCount === 0 && hasActiveFilters) {
-                if ($('#no-results').length === 0) {
-                    $('.row.g-4').after(
-                        '<div id="no-results" class="text-center text-muted py-5">' +
-                        '<h3 class="text-danger">🎮 No games found</h3>' +
-                        '<p>Try different keywords or categories</p>' +
-                        '<button class="btn btn-sm btn-outline-danger mt-2" onclick="clearSearch()">Clear Search</button>' +
-                        '</div>'
-                    );
-                }
-            } else {
-                $('#no-results').remove();
-            }
-
-            updateResultsCounter(visibleCount, gameCards.length, hasActiveFilters);
-        }
-
-        performSearch();
-    }
-}
-
-function initAutocompleteSearch() {
-    const searchInput = $('#searchInput');
-
-    if (searchInput.length) {
-        const games = [
-            'Dark Souls III', 'Hollow Knight', 'Code Vein', 'Blasphemous',
-            'Sekiro: Shadows Die Twice', 'Elden Ring', 'Salt and Sanctuary',
-            'Nioh 2', 'Dark Souls Remastered', 'Bloodborne', 'Mortal Shell', 'Lies of P'
-        ];
-
-        if (searchInput.parent().hasClass('position-relative') === false) {
-            searchInput.wrap('<div class="position-relative"></div>');
-        }
-        
-        if ($('#autocomplete-list').length === 0) {
-            searchInput.parent().append('<div id="autocomplete-list" class="autocomplete-list"></div>');
-        }
-
-        const autocompleteList = $('#autocomplete-list');
-
-        searchInput.on('input', function() {
-            const value = $(this).val().toLowerCase();
-            autocompleteList.empty().hide();
-
-            if (value.length > 1) {
-                const matches = games.filter(game =>
-                    game.toLowerCase().includes(value)
-                );
-
-                if (matches.length > 0) {
-                    matches.slice(0, 5).forEach(match => {
-                        const item = $('<div class="autocomplete-item"></div>')
-                            .html(`🎮 ${match}`)
-                            .on('click', function() {
-                                searchInput.val(match);
-                                performSearch();
-                                autocompleteList.empty().hide();
-                                playSound();
-                            });
-                        autocompleteList.append(item);
-                    });
-                    autocompleteList.show();
-                }
-            }
-        });
-
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#searchInput, #autocomplete-list').length) {
-                autocompleteList.hide();
-            }
-        });
-    }
-}
-
-function initSearchHighlighting() {
-    if ($('#faq').length > 0 && $('#faq-search-container').length === 0) {
-        $('<div id="faq-search-container" class="mb-4">' +
-            '<div class="input-group">' +
-            '<input type="text" class="form-control bg-dark text-white border-danger" ' +
-            'placeholder="🔍 Search in FAQ answers..." id="faq-search">' +
-            '<button class="btn btn-outline-danger" type="button" id="clear-highlight">Clear</button>' +
-            '</div>' +
-            '<small class="text-muted mt-2 d-block">Type to highlight matching terms in FAQ answers</small>' +
-            '</div>').insertBefore('#faq');
-
-        let originalContents = {};
-
-        $('.accordion-content').each(function() {
-            const id = $(this).attr('id') || 'content-' + Math.random();
-            $(this).attr('data-content-id', id);
-            if (!originalContents[id]) {
-                originalContents[id] = $(this).html();
-            }
-        });
-
-        $('#faq-search').on('input', function() {
-            const searchTerm = $(this).val().trim();
-
-            $('.accordion-content').each(function() {
-                const id = $(this).attr('data-content-id');
-                $(this).html(originalContents[id]);
-            });
-
-            if (searchTerm.length > 2) {
-                const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-
-                $('.accordion-content').each(function() {
-                    const currentHtml = $(this).html();
-                    const highlightedHtml = currentHtml.replace(regex, '<mark class="highlight">$1</mark>');
-                    $(this).html(highlightedHtml);
-                });
-                playSound();
-            }
-        });
-
-        $('#clear-highlight').on('click', function() {
-            $('#faq-search').val('');
-            $('.accordion-content').each(function() {
-                const id = $(this).attr('data-content-id');
-                $(this).html(originalContents[id]);
-            });
-            playSound();
-        });
-
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-    }
-}
-
-function initScrollProgressBar() {
-    if ($('#scroll-progress').length === 0) {
-        $('body').prepend(`
-            <div id="scroll-progress-container">
-                <div id="scroll-progress"></div>
-            </div>
-        `);
+function initLibraryRatings() {
+    // Only run on library page
+    if (!window.location.pathname.includes('library.html')) {
+        return;
     }
 
-    $(window).on('scroll', function() {
-        const windowHeight = $(window).height();
-        const documentHeight = $(document).height();
-        const scrollTop = $(window).scrollTop();
+    // Add rated games section to library
+    addRatedGamesSection();
 
-        const progress = (scrollTop / (documentHeight - windowHeight)) * 100;
-        $('#scroll-progress').css('width', progress + '%');
-    });
+    // Update display
+    updateRatedGamesDisplay();
 }
 
-function initAnimatedCounter() {
-    if ($('.stats-counter').length === 0 && $('.main-content').length > 0) {
-        const statsSection = `
-            <section class="stats-section py-5 bg-dark">
-                <div class="container">
-                    <div class="row g-4 text-center">
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <h2 class="text-danger stats-counter" data-target="12">0</h2>
-                                <p class="text-muted">Games in Library</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <h2 class="text-danger stats-counter" data-target="50">0</h2>
-                                <p class="text-muted">Boss Guides</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-item">
-                                <h2 class="text-danger stats-counter" data-target="1000">0</h2>
-                                <p class="text-muted">Community Members</p>
-                            </div>
+function addRatedGamesSection() {
+    // Check if section already exists
+    if ($('#rated-games-section').length > 0) {
+        return;
+    }
+
+    // Add rated games section after the carousel
+    $('.carousel').after(`
+        <section id="rated-games-section" class="rated-games-section mb-5">
+            <div class="container">
+                <h2 class="text-center text-danger mb-4 display-4">⭐ Your Rated Games</h2>
+                <p class="text-center text-muted mb-4">Games you've rated will appear here</p>
+                <div id="rated-games-container" class="row g-4">
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-dark">
+                            <h4 class="text-danger">No Rated Games Yet</h4>
+                            <p class="mb-3">Rate some games to see them here!</p>
+                            <a href="index.html" class="btn btn-danger">Discover Games</a>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
+    `);
+}
+
+function updateRatedGamesDisplay() {
+    const container = $('#rated-games-container');
+    if (container.length === 0) return;
+
+    if (!authSystem.currentUser) {
+        container.html(`
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-warning">
+                    <h4 class="text-warning">Please Log In</h4>
+                    <p class="mb-3">You need to be logged in to see your rated games</p>
+                    <a href="auth.html" class="btn btn-danger">Login / Sign Up</a>
+                </div>
+            </div>
+        `);
+        return;
+    }
+
+    const ratedGames = authSystem.getRatedGames();
+
+    if (ratedGames.length === 0) {
+        container.html(`
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-dark">
+                    <h4 class="text-danger">No Rated Games Yet</h4>
+                    <p class="mb-3">Rate some games to see them here!</p>
+                    <a href="index.html" class="btn btn-danger">Discover Games</a>
+                </div>
+            </div>
+        `);
+        return;
+    }
+
+    let html = '';
+
+    ratedGames.sort((a, b) => new Date(b.ratedAt) - new Date(a.ratedAt)).forEach(game => {
+        const stars = '⭐'.repeat(game.rating) + '☆'.repeat(5 - game.rating);
+        const ratedDate = new Date(game.ratedAt).toLocaleDateString();
+
+        html += `
+            <div class="col-md-6 col-lg-4">
+                <div class="card bg-secondary text-white h-100 shadow">
+                    <img src="${game.image || 'https://via.placeholder.com/400x200/2a2a2a/666?text=Game+Image'}" 
+                         class="card-img-top" 
+                         alt="${game.name}"
+                         style="height: 200px; object-fit: cover;"
+                         onerror="this.src='https://via.placeholder.com/400x200/2a2a2a/666?text=Game+Image'">
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-danger">${game.name}</h5>
+                        
+                        <div class="mb-3">
+                            <div class="rating-badge bg-dark rounded p-2 text-center">
+                                <div class="stars-large mb-1">${stars}</div>
+                                <small class="text-warning">Your rating: ${game.rating}/5</small>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-calendar me-1"></i>Rated on: ${ratedDate}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <button onclick="editRating('${game.id}')" 
+                                    class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                ✏️ Edit Rating
+                            </button>
+                            <button onclick="removeRating('${game.id}')" 
+                                    class="btn btn-outline-danger btn-sm w-100">
+                                🗑️ Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
+    });
 
-        $('.main-content').append(statsSection);
+    container.html(html);
+}
+
+// Functions for rating management
+function editRating(gameId) {
+    if (!authSystem.currentUser) return;
+
+    const ratedGames = authSystem.getRatedGames();
+    const game = ratedGames.find(g => g.id === gameId);
+
+    if (game) {
+        const newRating = prompt(`Edit your rating for "${game.name}" (1-5 stars):`, game.rating);
+
+        if (newRating && parseInt(newRating) >= 1 && parseInt(newRating) <= 5) {
+            authSystem.saveGameRating(gameId, game.name, parseInt(newRating), game.image);
+            showNotification(`Updated rating for "${game.name}" to ${newRating} stars!`, 'success');
+            updateRatedGamesDisplay();
+            playSound();
+        }
+    }
+}
+
+function removeRating(gameId) {
+    if (!authSystem.currentUser) return;
+
+    const ratedGames = authSystem.getRatedGames();
+    const game = ratedGames.find(g => g.id === gameId);
+
+    if (game && confirm(`Remove your rating for "${game.name}"?`)) {
+        // Remove from rated games
+        authSystem.currentUser.ratedGames = authSystem.currentUser.ratedGames.filter(g => g.id !== gameId);
+
+        // Remove from ratings
+        if (authSystem.currentUser.ratings && authSystem.currentUser.ratings[gameId]) {
+            delete authSystem.currentUser.ratings[gameId];
+        }
+
+        // Save changes
+        localStorage.setItem('currentUser', JSON.stringify(authSystem.currentUser));
+
+        // Update users array
+        const userIndex = authSystem.users.findIndex(u => u.id === authSystem.currentUser.id);
+        if (userIndex !== -1) {
+            authSystem.users[userIndex].ratedGames = authSystem.currentUser.ratedGames;
+            authSystem.users[userIndex].ratings = authSystem.currentUser.ratings;
+            authSystem.saveUsers();
+        }
+
+        showNotification(`Removed rating for "${game.name}"`, 'info');
+        updateRatedGamesDisplay();
+        playSound();
+    }
+}
+function initRatingSystem() {
+    // Main rating system
+    const stars = $('.star');
+    const ratingDisplay = $('#rating-display');
+
+    if (stars.length > 0) {
+        let currentRating = authSystem.getRating('overall') || 0;
+        updateStars(stars, currentRating);
+        ratingDisplay.text(`Your rating: ${currentRating}/5`);
+
+        stars.on('click', function() {
+            const rating = parseInt($(this).data('rating'));
+            currentRating = rating;
+            updateStars(stars, rating);
+            ratingDisplay.text(`Your rating: ${rating}/5`).addClass('text-success');
+
+            // Save to local storage
+            authSystem.saveRating('overall', rating);
+            playSound();
+        }).on('mouseover', function() {
+            const rating = parseInt($(this).data('rating'));
+            updateStars(stars, rating, true);
+        }).on('mouseout', function() {
+            updateStars(stars, currentRating);
+        });
     }
 
-    let animated = false;
+    // Card rating systems for game cards
+    $('.game-card').each(function() {
+        const card = $(this);
+        const gameTitle = card.find('.card-title').text().trim();
+        const gameImage = card.find('img').attr('src') || '';
+        const gameId = card.data('game-id') || gameTitle.toLowerCase().replace(/\s+/g, '-');
 
-    $(window).on('scroll', function() {
-        const counters = $('.stats-counter');
+        const stars = card.find('.star-small');
 
-        if (counters.length > 0 && !animated) {
-            const statsSection = counters.closest('.stats-section');
-            if (statsSection.length === 0) return;
-            
-            const sectionTop = statsSection.offset().top;
-            const windowBottom = $(window).scrollTop() + $(window).height();
+        if (stars.length > 0) {
+            let currentRating = authSystem.getGameRating(gameId) || 0;
+            updateCardStars(stars, currentRating);
 
-            if (windowBottom > sectionTop) {
-                animated = true;
-
-                counters.each(function() {
-                    const $this = $(this);
-                    const target = parseInt($this.data('target'));
-
-                    $({ counter: 0 }).animate({ counter: target }, {
-                        duration: 2000,
-                        easing: 'swing',
-                        step: function() {
-                            $this.text(Math.floor(this.counter) + '+');
-                        },
-                        complete: function() {
-                            $this.text(target + '+');
-                        }
-                    });
-                });
-            }
-        }
-    });
-}
-
-function initLoadingSpinner() {
-    $('#contact-form').on('submit', function(e) {
-        e.preventDefault();
-
-        const submitBtn = $(this).find('button[type="submit"]');
-        const originalText = submitBtn.html();
-
-        submitBtn.prop('disabled', true)
-            .html('<span class="spinner-border spinner-border-sm me-2"></span>Submitting...');
-
-        setTimeout(() => {
-            submitBtn.prop('disabled', false).html(originalText);
-            showNotification('Form submitted successfully! We will contact you soon.', 'success');
-            $(this)[0].reset();
-            $('#step-1').show().siblings('.form-step').hide();
-            $('#form-progress').css('width', '0%');
-            playSound();
-        }, 2000);
-    });
-}
-
-function initCopyToClipboard() {
-    $('.card-text').each(function(index) {
-        const $cardText = $(this);
-        const $card = $cardText.closest('.card-body');
-        
-        if ($card.find('.copy-btn').length > 0) return;
-        
-        if ($cardText.text().length > 50) {
-            const copyBtn = $(`
-                <button class="btn btn-sm btn-outline-light mt-2 copy-btn" data-index="${index}">
-                    <span class="copy-icon">📋</span> Copy Description
-                </button>
-            `);
-
-            $cardText.after(copyBtn);
-        }
-    });
-
-    $(document).on('click', '.copy-btn', function() {
-        const $btn = $(this);
-        const text = $btn.prev('.card-text').text();
-
-        navigator.clipboard.writeText(text).then(() => {
-            $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
-            showNotification('Copied to clipboard!', 'success');
-            playSound();
-            setTimeout(() => {
-                $btn.html('<span class="copy-icon">📋</span> Copy Description').removeClass('btn-success');
-            }, 2000);
-        }).catch(err => {
-            showNotification('Failed to copy', 'error');
-        });
-    });
-}
-
-function initLazyLoading() {
-    $('img').each(function() {
-        const $img = $(this);
-        const src = $img.attr('src');
-
-        if (src && !$img.hasClass('lazy-loaded') && !$img.hasClass('lazy-load')) {
-            $img.attr('data-src', src)
-                .attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
-                .addClass('lazy-load');
-        }
-    });
-
-    function lazyLoad() {
-        $('.lazy-load').each(function() {
-            const $img = $(this);
-            const imgTop = $img.offset().top;
-            const imgBottom = imgTop + $img.height();
-            const windowTop = $(window).scrollTop();
-            const windowBottom = windowTop + $(window).height();
-
-            if (imgBottom > windowTop && imgTop < windowBottom + 200) {
-                const src = $img.attr('data-src');
-                if (src) {
-                    $img.attr('src', src)
-                        .removeClass('lazy-load')
-                        .addClass('lazy-loaded')
-                        .on('load', function() {
-                            $(this).addClass('loaded');
-                        });
+            stars.on('click', function() {
+                if (!authSystem.currentUser) {
+                    showNotification('Please log in to rate games', 'error');
+                    return;
                 }
-            }
-        });
-    }
 
-    $(window).on('scroll resize', lazyLoad);
-    lazyLoad();
+                const rating = parseInt($(this).data('rating'));
+                currentRating = rating;
+                updateCardStars(stars, rating);
+
+                // Save to local storage with game info
+                const saved = authSystem.saveGameRating(gameId, gameTitle, rating, gameImage);
+
+                if (saved) {
+                    playSound();
+                    showNotification(`Rated "${gameTitle}" ${rating} stars! ⭐`, 'success');
+
+                    // Update library if we're on library page
+                    if (window.location.pathname.includes('library.html')) {
+                        updateRatedGamesDisplay();
+                    }
+                }
+            }).on('mouseover', function() {
+                const rating = parseInt($(this).data('rating'));
+                updateCardStars(stars, rating, true);
+            }).on('mouseout', function() {
+                updateCardStars(stars, currentRating);
+            });
+        }
+    });
+
+    // API game cards rating system
+    $('.api-game-card').each(function() {
+        const card = $(this);
+        const gameTitle = card.find('.card-title').text().trim();
+        const gameImage = card.find('img').attr('src') || '';
+        const gameId = 'api-' + (card.find('.card-title').text().trim().toLowerCase().replace(/\s+/g, '-'));
+
+        const stars = card.find('.star-api, .star-small');
+
+        if (stars.length > 0) {
+            let currentRating = authSystem.getGameRating(gameId) || 0;
+            updateCardStars(stars, currentRating);
+
+            stars.on('click', function() {
+                if (!authSystem.currentUser) {
+                    showNotification('Please log in to rate games', 'error');
+                    return;
+                }
+
+                const rating = parseInt($(this).data('rating'));
+                currentRating = rating;
+                updateCardStars(stars, rating);
+
+                // Save to local storage with game info
+                const saved = authSystem.saveGameRating(gameId, gameTitle, rating, gameImage);
+
+                if (saved) {
+                    playSound();
+                    showNotification(`Rated "${gameTitle}" ${rating} stars! ⭐`, 'success');
+                }
+            }).on('mouseover', function() {
+                const rating = parseInt($(this).data('rating'));
+                updateCardStars(stars, rating, true);
+            }).on('mouseout', function() {
+                updateCardStars(stars, currentRating);
+            });
+        }
+    });
+}
+
+function updateStars(stars, rating, isHover = false) {
+    stars.each(function(index) {
+        if (index < rating) {
+            $(this).css({
+                'color': '#ffd700',
+                'text-shadow': '0 0 10px gold',
+                'transform': 'scale(1.2)'
+            });
+        } else {
+            $(this).css({
+                'color': isHover ? '#ffd70066' : '#666',
+                'text-shadow': 'none',
+                'transform': 'scale(1)'
+            });
+        }
+    });
+}
+
+// Helper functions for rating storage
+function saveRating(key, rating) {
+    const ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
+    ratings[key] = rating;
+    localStorage.setItem('gameRatings', JSON.stringify(ratings));
+}
+
+function getRating(key) {
+    const ratings = JSON.parse(localStorage.getItem('gameRatings')) || {};
+    return ratings[key];
 }
 
 function initButtonEvents() {
@@ -1449,6 +1359,352 @@ function performSearch() {
     updateResultsCounter(visibleCount, gameCards.length, hasActiveFilters);
 }
 
+// ===== ENHANCED SEARCH AND FILTER SYSTEM =====
+function initEnhancedSearch() {
+    // Save search history
+    let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+    $('#searchInput').on('input', function() {
+        const query = $(this).val().trim();
+        if (query.length > 2) {
+            // Add to search history
+            if (!searchHistory.includes(query)) {
+                searchHistory.unshift(query);
+                searchHistory = searchHistory.slice(0, 10); // Keep last 10 searches
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            }
+        }
+        performSearch();
+    });
+
+    // Initialize with saved filters
+    const savedCategory = localStorage.getItem('selectedCategory') || '';
+    if (savedCategory) {
+        $('#categoryFilter').val(savedCategory);
+    }
+
+    $('#categoryFilter').on('change', function() {
+        localStorage.setItem('selectedCategory', $(this).val());
+        performSearch();
+        playSound();
+    });
+
+    // Load search history in autocomplete
+    updateAutocomplete();
+}
+
+function updateAutocomplete() {
+    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+    const autocompleteList = $('#autocomplete-list');
+
+    if (searchHistory.length > 0 && autocompleteList.length > 0) {
+        autocompleteList.empty();
+
+        searchHistory.forEach(term => {
+            const item = $('<div class="autocomplete-item"></div>')
+                .html(`📚 ${term}`)
+                .on('click', function() {
+                    $('#searchInput').val(term);
+                    performSearch();
+                    autocompleteList.hide();
+                    playSound();
+                });
+            autocompleteList.append(item);
+        });
+    }
+}
+
+function initAutocompleteSearch() {
+    const searchInput = $('#searchInput');
+
+    if (searchInput.length) {
+        const games = [
+            'Dark Souls III', 'Hollow Knight', 'Code Vein', 'Blasphemous',
+            'Sekiro: Shadows Die Twice', 'Elden Ring', 'Salt and Sanctuary',
+            'Nioh 2', 'Dark Souls Remastered', 'Bloodborne', 'Mortal Shell', 'Lies of P'
+        ];
+
+        if (searchInput.parent().hasClass('position-relative') === false) {
+            searchInput.wrap('<div class="position-relative"></div>');
+        }
+
+        if ($('#autocomplete-list').length === 0) {
+            searchInput.parent().append('<div id="autocomplete-list" class="autocomplete-list"></div>');
+        }
+
+        const autocompleteList = $('#autocomplete-list');
+
+        searchInput.on('input', function() {
+            const value = $(this).val().toLowerCase();
+            autocompleteList.empty().hide();
+
+            if (value.length > 1) {
+                const matches = games.filter(game =>
+                    game.toLowerCase().includes(value)
+                );
+
+                if (matches.length > 0) {
+                    matches.slice(0, 5).forEach(match => {
+                        const item = $('<div class="autocomplete-item"></div>')
+                            .html(`🎮 ${match}`)
+                            .on('click', function() {
+                                searchInput.val(match);
+                                performSearch();
+                                autocompleteList.empty().hide();
+                                playSound();
+                            });
+                        autocompleteList.append(item);
+                    });
+                    autocompleteList.show();
+                }
+            }
+        });
+
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#searchInput, #autocomplete-list').length) {
+                autocompleteList.hide();
+            }
+        });
+    }
+}
+
+function initSearchHighlighting() {
+    if ($('#faq').length > 0 && $('#faq-search-container').length === 0) {
+        $('<div id="faq-search-container" class="mb-4">' +
+            '<div class="input-group">' +
+            '<input type="text" class="form-control bg-dark text-white border-danger" ' +
+            'placeholder="🔍 Search in FAQ answers..." id="faq-search">' +
+            '<button class="btn btn-outline-danger" type="button" id="clear-highlight">Clear</button>' +
+            '</div>' +
+            '<small class="text-muted mt-2 d-block">Type to highlight matching terms in FAQ answers</small>' +
+            '</div>').insertBefore('#faq');
+
+        let originalContents = {};
+
+        $('.accordion-content').each(function() {
+            const id = $(this).attr('id') || 'content-' + Math.random();
+            $(this).attr('data-content-id', id);
+            if (!originalContents[id]) {
+                originalContents[id] = $(this).html();
+            }
+        });
+
+        $('#faq-search').on('input', function() {
+            const searchTerm = $(this).val().trim();
+
+            $('.accordion-content').each(function() {
+                const id = $(this).attr('data-content-id');
+                $(this).html(originalContents[id]);
+            });
+
+            if (searchTerm.length > 2) {
+                const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+
+                $('.accordion-content').each(function() {
+                    const currentHtml = $(this).html();
+                    const highlightedHtml = currentHtml.replace(regex, '<mark class="highlight">$1</mark>');
+                    $(this).html(highlightedHtml);
+                });
+                playSound();
+            }
+        });
+
+        $('#clear-highlight').on('click', function() {
+            $('#faq-search').val('');
+            $('.accordion-content').each(function() {
+                const id = $(this).attr('data-content-id');
+                $(this).html(originalContents[id]);
+            });
+            playSound();
+        });
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+    }
+}
+
+function initScrollProgressBar() {
+    if ($('#scroll-progress').length === 0) {
+        $('body').prepend(`
+            <div id="scroll-progress-container">
+                <div id="scroll-progress"></div>
+            </div>
+        `);
+    }
+
+    $(window).on('scroll', function() {
+        const windowHeight = $(window).height();
+        const documentHeight = $(document).height();
+        const scrollTop = $(window).scrollTop();
+
+        const progress = (scrollTop / (documentHeight - windowHeight)) * 100;
+        $('#scroll-progress').css('width', progress + '%');
+    });
+}
+
+function initAnimatedCounter() {
+    if ($('.stats-counter').length === 0 && $('.main-content').length > 0) {
+        const statsSection = `
+            <section class="stats-section py-5 bg-dark">
+                <div class="container">
+                    <div class="row g-4 text-center">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="12">0</h2>
+                                <p class="text-muted">Games in Library</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="50">0</h2>
+                                <p class="text-muted">Boss Guides</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h2 class="text-danger stats-counter" data-target="1000">0</h2>
+                                <p class="text-muted">Community Members</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+
+        $('.main-content').append(statsSection);
+    }
+
+    let animated = false;
+
+    $(window).on('scroll', function() {
+        const counters = $('.stats-counter');
+
+        if (counters.length > 0 && !animated) {
+            const statsSection = counters.closest('.stats-section');
+            if (statsSection.length === 0) return;
+
+            const sectionTop = statsSection.offset().top;
+            const windowBottom = $(window).scrollTop() + $(window).height();
+
+            if (windowBottom > sectionTop) {
+                animated = true;
+
+                counters.each(function() {
+                    const $this = $(this);
+                    const target = parseInt($this.data('target'));
+
+                    $({ counter: 0 }).animate({ counter: target }, {
+                        duration: 2000,
+                        easing: 'swing',
+                        step: function() {
+                            $this.text(Math.floor(this.counter) + '+');
+                        },
+                        complete: function() {
+                            $this.text(target + '+');
+                        }
+                    });
+                });
+            }
+        }
+    });
+}
+
+function initLoadingSpinner() {
+    $('#contact-form').on('submit', function(e) {
+        e.preventDefault();
+
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+
+        submitBtn.prop('disabled', true)
+            .html('<span class="spinner-border spinner-border-sm me-2"></span>Submitting...');
+
+        setTimeout(() => {
+            submitBtn.prop('disabled', false).html(originalText);
+            showNotification('Form submitted successfully! We will contact you soon.', 'success');
+            $(this)[0].reset();
+            $('#step-1').show().siblings('.form-step').hide();
+            $('#form-progress').css('width', '0%');
+            playSound();
+        }, 2000);
+    });
+}
+
+function initCopyToClipboard() {
+    $('.card-text').each(function(index) {
+        const $cardText = $(this);
+        const $card = $cardText.closest('.card-body');
+
+        if ($card.find('.copy-btn').length > 0) return;
+
+        if ($cardText.text().length > 50) {
+            const copyBtn = $(`
+                <button class="btn btn-sm btn-outline-light mt-2 copy-btn" data-index="${index}">
+                    <span class="copy-icon">📋</span> Copy Description
+                </button>
+            `);
+
+            $cardText.after(copyBtn);
+        }
+    });
+
+    $(document).on('click', '.copy-btn', function() {
+        const $btn = $(this);
+        const text = $btn.prev('.card-text').text();
+
+        navigator.clipboard.writeText(text).then(() => {
+            $btn.html('<span class="copy-icon">✓</span> Copied!').addClass('btn-success');
+            showNotification('Copied to clipboard!', 'success');
+            playSound();
+            setTimeout(() => {
+                $btn.html('<span class="copy-icon">📋</span> Copy Description').removeClass('btn-success');
+            }, 2000);
+        }).catch(err => {
+            showNotification('Failed to copy', 'error');
+        });
+    });
+}
+
+function initLazyLoading() {
+    $('img').each(function() {
+        const $img = $(this);
+        const src = $img.attr('src');
+
+        if (src && !$img.hasClass('lazy-loaded') && !$img.hasClass('lazy-load')) {
+            $img.attr('data-src', src)
+                .attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
+                .addClass('lazy-load');
+        }
+    });
+
+    function lazyLoad() {
+        $('.lazy-load').each(function() {
+            const $img = $(this);
+            const imgTop = $img.offset().top;
+            const imgBottom = imgTop + $img.height();
+            const windowTop = $(window).scrollTop();
+            const windowBottom = windowTop + $(window).height();
+
+            if (imgBottom > windowTop && imgTop < windowBottom + 200) {
+                const src = $img.attr('data-src');
+                if (src) {
+                    $img.attr('src', src)
+                        .removeClass('lazy-load')
+                        .addClass('lazy-loaded')
+                        .on('load', function() {
+                            $(this).addClass('loaded');
+                        });
+                }
+            }
+        });
+    }
+
+    $(window).on('scroll resize', lazyLoad);
+    lazyLoad();
+}
+
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 window.changeFactManually = changeFactManually;
+

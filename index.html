@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="api-integration.js"></script>
 </head>
 
 <body>
@@ -33,6 +35,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="contact.html">Contact</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html" id="auth-link">
+                        <span id="auth-text">Login</span>
+                    </a>
+                </li>
             </ul>
             <!-- Language Selector -->
             <div class="language-selector ms-3">
@@ -46,12 +53,53 @@
     </div>
 </nav>
 
-<!-- Hero Section -->
+<!-- Enhanced Hero Section -->
 <section id="hero" class="hero-section vh-100 d-flex align-items-center">
     <div class="hero-overlay position-absolute w-100 h-100"></div>
     <div class="container position-relative text-center text-white">
-        <h1 class="display-3 fw-bold mb-4" data-translate="welcome">SOULS-LIKE GAMES</h1>
-        <p class="lead mb-0">Discover the world of hardcore games.<br>Find any souls-like game in our extensive library</p>
+        <h1 class="display-2 fw-bold mb-4 hero-title-enhanced" data-translate="welcome">SOULS-LIKE GAMES</h1>
+        <p class="lead mb-3 fs-3">Master the Art of Challenging Gameplay</p>
+        <p class="mb-5 fs-5" style="max-width: 700px; margin: 0 auto;">
+            Discover the world of hardcore games where every death teaches a lesson,
+            every boss battle tests your skill, and every victory feels earned.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-buttons mb-5">
+            <a href="library.html" class="btn btn-danger btn-lg me-3 mb-2">
+                🎮 Explore Library
+            </a>
+            <a href="about.html" class="btn btn-outline-light btn-lg mb-2">
+                📖 Learn More
+            </a>
+        </div>
+
+        <!-- Stats Cards in Hero -->
+        <div class="row g-4 mt-5" style="max-width: 900px; margin: 0 auto;">
+            <div class="col-md-4">
+                <div class="hero-stat-card">
+                    <div class="stat-icon">⚔️</div>
+                    <h3 class="stat-number">15+</h3>
+                    <p class="stat-label">Games in Library</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="hero-stat-card">
+                    <div class="stat-icon">📚</div>
+                    <h3 class="stat-number">50+</h3>
+                    <p class="stat-label">Boss Guides</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="hero-stat-card">
+                    <div class="stat-icon">👥</div>
+                    <h3 class="stat-number">1000+</h3>
+                    <p class="stat-label">Community Members</p>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </section>
 
@@ -79,9 +127,58 @@
             </div>
         </div>
     </section>
+    <!-- API-Powered Game Discovery Section -->
+    <section class="py-5 bg-dark" id="game-discovery">
+        <div class="container">
+            <h2 class="text-center text-danger mb-3 display-4">🎮 Discover Games</h2>
+            <p class="text-center text-muted mb-4">Powered by RAWG Video Games Database API</p>
 
+            <div class="search-section mb-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input
+                                type="text"
+                                class="form-control bg-secondary text-white border-dark"
+                                id="apiSearchInput"
+                                placeholder="Search for games... (try 'souls-like', 'dark souls', 'action RPG')"
+                                value="souls-like"
+                        >
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-danger w-100" onclick="searchGamesAPI()">
+                            🔍 Search Games
+                        </button>
+                    </div>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted">Real game data from RAWG API • Updates automatically</small>
+                </div>
+            </div>
+
+            <div id="api-loading" class="text-center py-5">
+                <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;"></div>
+                <p class="text-white mt-3 fs-5">Loading Souls-like games...</p>
+                <p class="text-muted">This may take a few seconds...</p>
+            </div>
+
+            <div id="api-error" class="alert alert-warning text-center" style="display: none;"></div>
+
+            <div id="api-results" class="row g-4">
+                <!-- Games will be loaded here by JavaScript -->
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-light me-2" onclick="rawgAPI.clearCache(); loadSoulsLike();">
+                    🔄 Refresh Cache
+                </button>
+                <button class="btn btn-outline-warning" onclick="loadSoulsLike()">
+                    💀 Load Souls-like Games
+                </button>
+            </div>
+        </div>
+    </section>
     <!-- Task 2: Card Group with Media Queries -->
-    <section class="py-5 bg-dark">
+    <section class="py-5">
         <div class="container">
             <h2 class="text-center text-danger mb-5 display-4">Popular Souls-like Games</h2>
             <div class="row g-4">
@@ -120,20 +217,20 @@
     </section>
 
     <!-- Task 3: Bootstrap Grid Layout -->
-    <section class="py-5">
+    <section class="py-5 bg-dark">
         <div class="container">
             <h2 class="text-center text-danger mb-5 display-4">Categories of Souls-like Games</h2>
 
             <!-- Two Column Section -->
             <div class="row mb-5">
                 <div class="col-lg-6 mb-4">
-                    <div class="p-4 bg-dark text-white rounded shadow">
+                    <div class="p-4 bg-secondary text-white rounded shadow">
                         <h3 class="text-danger">Classic Souls-likes</h3>
                         <p>Games that follow the traditional Dark Souls formula with interconnected worlds, bonfire checkpoints, and methodical combat.</p>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
-                    <div class="p-4 bg-dark text-white rounded shadow">
+                    <div class="p-4 bg-secondary text-white rounded shadow">
                         <h3 class="text-danger">Modern Interpretations</h3>
                         <p>Newer games that adapt souls-like mechanics to different genres and settings while maintaining the core challenge.</p>
                     </div>
@@ -174,7 +271,7 @@
     </section>
 
     <!-- Advanced Features Section -->
-    <section class="py-5 bg-dark">
+    <section class="py-5">
         <div class="container">
             <h2 class="text-center text-danger mb-5 display-4">Interactive Features</h2>
 
@@ -242,7 +339,7 @@
         </div>
     </section>
 
- <!-- Random Facts Section - Add this before </main> -->
+    <!-- Random Facts Section -->
     <section class="random-facts-section">
         <div class="container">
             <h2 class="text-center text-danger mb-4 display-4">🎮 Did You Know?</h2>
@@ -301,7 +398,10 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script.js"></script>
+<script src="api-integration.js"></script>
+<script src="auth.js"></script>        <!-- ПОТОМ -->
+<script src="script.js"></script>      <!-- ОСТАЛЬНЫЕ -->
 </body>
 
 </html>
+

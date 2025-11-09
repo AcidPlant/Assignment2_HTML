@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Souls-like Games</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: var(--dark-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-container {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .auth-card {
+            background: var(--darker-bg);
+            border: 2px solid var(--accent-red);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none;
+        }
+        .btn-auth {
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-red-dark));
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+        }
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+        }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <!-- Success Message -->
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2 class="text-center text-danger mb-4">🔐 Login</h2>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label text-white">Email</label>
+                    <input type="email" class="form-control bg-dark text-white border-dark"
+                           id="login-email" placeholder="your@email.com" required>
+                    <div class="error-message text-danger mt-1" id="login-email-error" style="display: none;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">Password</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control bg-dark text-white border-dark"
+                               id="login-password" placeholder="Your password" required>
+                        <span class="password-toggle-icon text-white">👁️</span>
+                    </div>
+                    <div class="error-message text-danger mt-1" id="login-password-error" style="display: none;"></div>
+                </div>
+                <button type="submit" class="btn btn-auth text-white w-100 mb-3">Login</button>
+            </form>
+            <div class="text-center">
+                <span class="text-white">Don't have an account? </span>
+                <a href="#" class="text-danger" onclick="showSignup()">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" style="display: none;">
+            <h2 class="text-center text-danger mb-4">🎮 Sign Up</h2>
+            <form id="signupForm">
+                <div class="mb-3">
+                    <label class="form-label text-white">Full Name</label>
+                    <input type="text" class="form-control bg-dark text-white border-dark"
+                           id="signup-name" placeholder="John Doe" required>
+                    <div class="error-message text-danger mt-1" id="signup-name-error" style="display: none;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">Email</label>
+                    <input type="email" class="form-control bg-dark text-white border-dark"
+                           id="signup-email" placeholder="your@email.com" required>
+                    <div class="error-message text-danger mt-1" id="signup-email-error" style="display: none;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">Password</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control bg-dark text-white border-dark"
+                               id="signup-password" placeholder="Min. 8 characters" required>
+                        <span class="password-toggle-icon text-white">👁️</span>
+                    </div>
+                    <div class="error-message text-danger mt-1" id="signup-password-error" style="display: none;"></div>
+                    <!-- Password strength will be added here by JavaScript -->
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">Confirm Password</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control bg-dark text-white border-dark"
+                               id="signup-confirm" placeholder="Confirm password" required>
+                        <span class="password-toggle-icon text-white">👁️</span>
+                    </div>
+                    <div class="error-message text-danger mt-1" id="signup-confirm-error" style="display: none;"></div>
+                </div>
+                <button type="submit" class="btn btn-auth text-white w-100 mb-3">Create Account</button>
+            </form>
+            <div class="text-center">
+                <span class="text-white">Already have an account? </span>
+                <a href="#" class="text-danger" onclick="showLogin()">Login</a>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="index.html" class="text-white">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
