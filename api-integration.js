@@ -5,6 +5,12 @@ class RAWGAPI {
     constructor() {
         this.apiKey = '84fc938f57ac48cd9241edaadd2349f0';
         this.baseURL = 'https://api.rawg.io/api';
+        this.adultGames = [
+            'manhunt', 'postal', 'hatred', 'agony', 'lust for darkness',
+            'succubus', 'seduce me', 'eroge', 'hentai', 'adult',
+            'leisure suit larry', 'custer\'s revenge', 'bmx xxx',
+            'Shoot Shoot My Waifu' // ← добавь сюда
+        ];
         console.log('🔑 API System Initialized');
     }
 
