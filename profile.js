@@ -274,46 +274,56 @@ class ProfileManager {
         $('#total-days').text(Math.max(1, daysAsMember));
     }
 
-    editGameRating(gameId) {
-        if (!this.currentUser) return;
+   editGameRating(gameId) {
+    if (!window.authSystem || !window.authSystem.currentUser) return;
 
-        const ratedGames = this.currentUser.ratedGames || [];
-        const game = ratedGames.find(g => g.id === gameId);
+    const currentUser = window.authSystem.currentUser;
+    const game = currentUser.ratedGames.find(g => g.id === gameId);
 
-        if (game) {
-            const newRating = prompt(`Edit your rating for "${game.name}" (1-5 stars):`, game.rating);
+    if (game) {
+        const newRating = prompt(`Edit your rating for "${game.name}" (1-5 stars):`, game.rating);
 
-            if (newRating && parseInt(newRating) >= 1 && parseInt(newRating) <= 5) {
-                // Update rating
-                if (window.authSystem) {
-                    window.authSystem.saveGameRating(gameId, game.name, parseInt(newRating), game.image, game.genre);
-                }
+        if (newRating && parseInt(newRating) >= 1 && parseInt(newRating) <= 5) {
+            window.authSystem.saveGameRating(gameId, game.name, parseInt(newRating), game.image, game.genre);
 
-                showNotification(`Updated rating for "${game.name}" to ${newRating} stars!`, 'success');
-                this.refreshProfileData();
-                playSound();
-            }
-        }
-    }
-
-    removeGameRating(gameId) {
-        if (!this.currentUser) return;
-
-        const ratedGames = this.currentUser.ratedGames || [];
-        const game = ratedGames.find(g => g.id === gameId);
-
-        if (game && confirm(`Are you sure you want to remove your rating for "${game.name}"?`)) {
-            if (window.authSystem) {
-                window.authSystem.removeGameRating(gameId);
-            }
-
-            showNotification(`Removed rating for "${game.name}"`, 'info');
-            this.refreshProfileData();
+            showNotification(`Updated rating for "${game.name}" to ${newRating} stars!`, 'success');
             playSound();
+
+            // Refresh UI
+            this.currentUser = window.authSystem.currentUser;
+            this.refreshProfileData();
         }
     }
+}
+
+
+   removeGameRating(gameId) {
+    // Get the latest currentUser from authSystem
+    if (!window.authSystem || !window.authSystem.currentUser) return;
+
+    const currentUser = window.authSystem.currentUser;
+    const ratedGames = currentUser.ratedGames || [];
+    const game = ratedGames.find(g => g.id === gameId);
+
+    if (game && confirm(`Are you sure you want to remove your rating for "${game.name}"?`)) {
+        // Remove from authSystem
+        window.authSystem.removeGameRating(gameId);
+
+        // Show notification
+        showNotification(`Removed rating for "${game.name}"`, 'info');
+        playSound();
+
+        // Sync ProfileManager's currentUser
+        this.currentUser = window.authSystem.currentUser;
+
+        // Refresh UI
+        this.refreshProfileData();
+    }
+}
+
 
     refreshProfileData() {
+        this.currentUser = window.authSystem.currentUser;
         this.loadProfileData();
         this.displayRatedGames();
         this.updateStats();
