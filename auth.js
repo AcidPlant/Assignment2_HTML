@@ -352,6 +352,29 @@ class AuthSystem {
     getRatedGames() {
         return this.currentUser?.ratedGames || [];
     }
+
+    removeGameRating(gameId) {
+    if (!this.currentUser || !this.currentUser.ratedGames) return;
+
+    // Remove game from ratedGames array
+    this.currentUser.ratedGames = this.currentUser.ratedGames.filter(g => g.id !== gameId);
+
+    // Remove rating from ratings object if exists
+    if (this.currentUser.ratings && this.currentUser.ratings[gameId]) {
+        delete this.currentUser.ratings[gameId];
+    }
+
+    // Save updated user in localStorage
+    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+
+    // Update user in soulslike_users array
+    const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
+    if (userIndex !== -1) {
+        this.users[userIndex] = this.currentUser;
+        this.saveUsers();
+    }
+    }
+
 }
 
 // Global functions
