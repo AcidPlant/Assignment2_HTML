@@ -1,16 +1,10 @@
 // api-integration.js - Enhanced with RAWG Links (FIXED)
 console.log('🚀 API Integration loading...');
-
+const blockedTags = ["nsfw", "hentai", "nudity","lgbt", "yaoi", "yuri", "sexual-content"];
 class RAWGAPI {
     constructor() {
         this.apiKey = '84fc938f57ac48cd9241edaadd2349f0';
         this.baseURL = 'https://api.rawg.io/api';
-        this.adultGames = [
-            'manhunt', 'postal', 'hatred', 'agony', 'lust for darkness',
-            'succubus', 'seduce me', 'eroge', 'hentai', 'adult',
-            'leisure suit larry', 'custer\'s revenge', 'bmx xxx',
-            'Shoot Shoot My Waifu'
-        ];
         console.log('🔑 API System Initialized');
     }
 
@@ -123,6 +117,12 @@ window.rawgAPI = new RAWGAPI();
 // Display function with RAWG links
 function displayGames(games, title) {
     console.log('🎨 Displaying games:', games.length);
+ 
+     // Filter out adult games based on RAWG tags
+    const filteredGames = games.filter(game => {
+        if (!game.tags) return true; // keep if no tags
+        return !game.tags.some(tag => blockedTags.includes(tag.slug));
+    });
 
     const container = document.getElementById('api-results');
     const loading = document.getElementById('api-loading');
@@ -137,6 +137,14 @@ function displayGames(games, title) {
 
     // Clear container
     container.innerHTML = '';
+
+    // Use filtered games from now on
+    games = filteredGames;
+
+    if (games.length === 0) {
+        container.innerHTML = `<p class="text-center text-warning">No games found after filtering adult content.</p>`;
+        return;
+    }
 
     // Add title
     const titleHTML = `
