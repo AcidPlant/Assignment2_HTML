@@ -1,4 +1,4 @@
-// api-integration.js - Enhanced with Ratings
+// api-integration.js - Enhanced with RAWG Links (FIXED)
 console.log('🚀 API Integration loading...');
 
 class RAWGAPI {
@@ -9,7 +9,7 @@ class RAWGAPI {
             'manhunt', 'postal', 'hatred', 'agony', 'lust for darkness',
             'succubus', 'seduce me', 'eroge', 'hentai', 'adult',
             'leisure suit larry', 'custer\'s revenge', 'bmx xxx',
-            'Shoot Shoot My Waifu' // ← добавь сюда
+            'Shoot Shoot My Waifu'
         ];
         console.log('🔑 API System Initialized');
     }
@@ -54,6 +54,7 @@ class RAWGAPI {
             results: [
                 {
                     id: 1,
+                    slug: 'dark-souls-iii',
                     name: "Dark Souls III",
                     rating: 4.8,
                     released: "2016-04-12",
@@ -63,6 +64,7 @@ class RAWGAPI {
                 },
                 {
                     id: 2,
+                    slug: 'elden-ring',
                     name: "Elden Ring",
                     rating: 4.9,
                     released: "2022-02-25",
@@ -72,6 +74,7 @@ class RAWGAPI {
                 },
                 {
                     id: 3,
+                    slug: 'hollow-knight',
                     name: "Hollow Knight",
                     rating: 4.7,
                     released: "2017-02-24",
@@ -81,6 +84,7 @@ class RAWGAPI {
                 },
                 {
                     id: 4,
+                    slug: 'sekiro-shadows-die-twice',
                     name: "Sekiro: Shadows Die Twice",
                     rating: 4.8,
                     released: "2019-03-22",
@@ -90,6 +94,7 @@ class RAWGAPI {
                 },
                 {
                     id: 5,
+                    slug: 'bloodborne',
                     name: "Bloodborne",
                     rating: 4.9,
                     released: "2015-03-24",
@@ -99,6 +104,7 @@ class RAWGAPI {
                 },
                 {
                     id: 6,
+                    slug: 'code-vein',
                     name: "Code Vein",
                     rating: 4.2,
                     released: "2019-09-27",
@@ -114,7 +120,7 @@ class RAWGAPI {
 // Create global instance
 window.rawgAPI = new RAWGAPI();
 
-// Display function with ratings
+// Display function with RAWG links
 function displayGames(games, title) {
     console.log('🎨 Displaying games:', games.length);
 
@@ -142,7 +148,7 @@ function displayGames(games, title) {
                     🔄 Clear
                 </button>
                 <button class="btn btn-sm btn-outline-info" onclick="loadSoulsLike()">
-                    💀 Load Souls-like
+                    👀 Load Souls-like
                 </button>
             </div>
         </div>
@@ -152,6 +158,9 @@ function displayGames(games, title) {
     // Add games
     games.forEach(game => {
         const gameId = `api-${game.id}`;
+        const gameSlug = game.slug || game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const rawgUrl = `https://rawg.io/games/${gameSlug}`;
+        
         const userRating = window.authSystem ? window.authSystem.getGameRating(gameId) : 0;
         const stars = userRating ? '⭐'.repeat(userRating) + '☆'.repeat(5 - userRating) : '☆☆☆☆☆';
 
@@ -203,14 +212,25 @@ function displayGames(games, title) {
                         </div>
                         
                         <div class="mt-auto">
-                            <div class="btn-group w-100">
-                                <button class="btn btn-danger btn-sm" onclick="showGameDetails('${game.name}')">
-                                    📖 Details
+                            <div class="btn-group w-100 mb-2">
+                                <button class="btn btn-danger btn-sm" 
+                                        onclick="openRAWGPage('${rawgUrl}', '${game.name.replace(/'/g, "\\'")}')"
+                                        title="View full details on RAWG">
+                                    📖 Full Details
                                 </button>
-                                <button class="btn btn-outline-light btn-sm" onclick="addToLibrary('${game.name}')">
+                                <button class="btn btn-outline-light btn-sm" 
+                                        onclick="addToLibrary('${game.name.replace(/'/g, "\\'")}')"
+                                        title="Add to your library">
                                     ➕ Library
                                 </button>
                             </div>
+                            <small class="text-muted d-block text-center">
+                                <a href="${rawgUrl}" target="_blank" rel="noopener noreferrer" 
+                                   class="text-info text-decoration-none" 
+                                   title="Open ${game.name} on RAWG.io">
+                                    🔗 View on RAWG.io
+                                </a>
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -263,7 +283,7 @@ function initRatingStars() {
 
 // Load Souls-like games
 async function loadSoulsLike() {
-    console.log('💀 Loading Souls-like games...');
+    console.log('👀 Loading Souls-like games...');
 
     const loading = document.getElementById('api-loading');
     const error = document.getElementById('api-error');
@@ -275,7 +295,7 @@ async function loadSoulsLike() {
 
     try {
         const data = await window.rawgAPI.getSoulsLikeGames();
-        displayGames(data.results, "💀 Souls-like Games");
+        displayGames(data.results, "👀 Souls-like Games");
     } catch (error) {
         console.error('Load error:', error);
         if (error) {
@@ -317,6 +337,19 @@ function clearSearch() {
     loadSoulsLike();
 }
 
+// NEW: Open RAWG page function
+function openRAWGPage(url, gameName) {
+    console.log(`🔗 Opening RAWG page for: ${gameName}`);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    
+    if (typeof playSound === 'function') {
+        playSound();
+    }
+    if (typeof showNotification === 'function') {
+        showNotification(`Opening ${gameName} on RAWG.io...`, 'info');
+    }
+}
+
 // Helper functions
 function showGameDetails(gameName) {
     showNotification(`Details for: ${gameName}`, 'info');
@@ -331,7 +364,7 @@ function addToLibrary(gameName) {
     playSound();
 }
 
-// Initialize when page loads
+// Initialize when page loads - EXACT COPY FROM YOUR WORKING FILE
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM loaded, initializing API...');
 
@@ -347,5 +380,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.loadSoulsLike = loadSoulsLike;
 window.searchGamesAPI = searchGamesAPI;
 window.clearSearch = clearSearch;
+window.openRAWGPage = openRAWGPage;
 
 console.log('✅ API Integration loaded successfully');
